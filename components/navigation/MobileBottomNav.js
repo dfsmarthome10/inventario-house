@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 function isActive(pathname, href) {
   if (href === "/") {
@@ -22,17 +22,10 @@ function TabIcon({ type, active = false }) {
     );
   }
 
-  if (type === "quick") {
+  if (type === "back") {
     return (
       <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M12 3v4" />
-        <path d="M12 17v4" />
-        <path d="M3 12h4" />
-        <path d="M17 12h4" />
-        <path d="M6.5 6.5l2.8 2.8" />
-        <path d="M14.7 14.7l2.8 2.8" />
-        <path d="M17.5 6.5l-2.8 2.8" />
-        <path d="M9.3 14.7l-2.8 2.8" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 5l-7 7 7 7" />
       </svg>
     );
   }
@@ -71,11 +64,21 @@ function TabIcon({ type, active = false }) {
 }
 
 export default function MobileBottomNav() {
+  const router = useRouter();
   const pathname = usePathname();
   const shoppingActive = isActive(pathname, "/shopping");
   const inventoryActive = isActive(pathname, "/inventory");
   const homeActive = isActive(pathname, "/");
   const adminActive = isActive(pathname, "/admin");
+
+  function handleGoBack() {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push("/inventory/comida");
+  }
 
   return (
     <div className="ios-bottom-nav md:hidden">
@@ -99,10 +102,10 @@ export default function MobileBottomNav() {
           <span>Admin</span>
         </Link>
 
-        <Link href="/admin/nfc" className={`ios-bottom-tab ${isActive(pathname, "/admin/nfc") ? "ios-bottom-tab-active" : ""}`}>
-          <TabIcon type="quick" active={isActive(pathname, "/admin/nfc")} />
-          <span>NFC</span>
-        </Link>
+        <button type="button" onClick={handleGoBack} className="ios-bottom-tab">
+          <TabIcon type="back" active={false} />
+          <span>Atras</span>
+        </button>
       </div>
     </div>
   );
