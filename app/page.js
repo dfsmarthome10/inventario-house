@@ -28,7 +28,7 @@ export default async function HomePage() {
             <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.total}</p>
           </div>
           <div className="rounded-2xl bg-rose-50 p-3">
-            <p className="text-[11px] uppercase tracking-wide text-rose-500">Stock bajo</p>
+            <p className="text-[11px] uppercase tracking-wide text-rose-500">Bajo/Critico</p>
             <p className="mt-1 text-2xl font-semibold text-rose-700">{summary.lowStock.length}</p>
           </div>
           <div className="rounded-2xl bg-emerald-50 p-3">
@@ -38,6 +38,33 @@ export default async function HomePage() {
           <div className="rounded-2xl bg-sky-50 p-3">
             <p className="text-[11px] uppercase tracking-wide text-sky-600">Herramientas</p>
             <p className="mt-1 text-2xl font-semibold text-sky-800">{summary.byMainCategory.herramientas || 0}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="ios-widget-strong">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-slate-900">Prioridad de stock</h2>
+          <Link href="/inventory?low_stock=1" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium hover:bg-slate-50">
+            Ver bajo stock
+          </Link>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-4">
+          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-3">
+            <p className="text-[11px] uppercase tracking-wide text-rose-600">Critico</p>
+            <p className="mt-1 text-xl font-semibold text-rose-700">{summary.stockPriority.critical}</p>
+          </div>
+          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-3">
+            <p className="text-[11px] uppercase tracking-wide text-rose-600">Alto</p>
+            <p className="mt-1 text-xl font-semibold text-rose-700">{summary.stockPriority.high}</p>
+          </div>
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3">
+            <p className="text-[11px] uppercase tracking-wide text-amber-700">Medio</p>
+            <p className="mt-1 text-xl font-semibold text-amber-800">{summary.stockPriority.medium}</p>
+          </div>
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3">
+            <p className="text-[11px] uppercase tracking-wide text-emerald-700">Normal</p>
+            <p className="mt-1 text-xl font-semibold text-emerald-800">{summary.stockPriority.normal}</p>
           </div>
         </div>
       </section>
@@ -134,6 +161,14 @@ export default async function HomePage() {
               ))}
             </div>
           )}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link href="/inventory?low_stock=1" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
+              Solo bajo stock
+            </Link>
+            <Link href="/shopping/comida?low_stock=1" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
+              Ir a compras
+            </Link>
+          </div>
         </div>
       </section>
 

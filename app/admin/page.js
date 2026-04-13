@@ -1,8 +1,10 @@
 import Link from "next/link";
 import ThumbnailImage from "@/components/common/ThumbnailImage";
+import DeleteItemControl from "@/components/admin/DeleteItemControl";
+import { getStockPriority, isLowStock } from "@/lib/inventoryFilters";
 import { getItemsByCategory } from "@/lib/inventoryRepository";
 import { buildFullNfcUrl } from "@/lib/nfc";
-import { decrementQuantityAction, incrementQuantityAction } from "./actions";
+import { decrementQuantityAction, deleteItemAction, incrementQuantityAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +19,13 @@ const FOOD_SUBCATEGORY_META = {
   lacena: "Lacena",
   nevera: "Nevera",
   congelador: "Congelador",
+};
+
+const PRIORITY_META = {
+  critical: "bg-rose-600 text-white",
+  high: "bg-rose-100 text-rose-700",
+  medium: "bg-amber-100 text-amber-700",
+  normal: "bg-emerald-100 text-emerald-700",
 };
 
 function QuantityActions({ itemId }) {
@@ -43,6 +52,7 @@ function ItemAdminCard({ item }) {
   const quantityMeta = item.unidad && typeof item.cantidad_actual === "number" ? ` ${item.unidad}` : "";
   const nfcLabel = item.nfc_mode === "item" ? "Item NFC" : item.nfc_mode === "zone" ? "Zona NFC" : "Sin NFC";
   const nfcUrl = item.nfc_target_path ? buildFullNfcUrl(item.nfc_target_path) : "";
+  const priority = getStockPriority(item);
 
   return (
     <article key={item.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -62,6 +72,16 @@ function ItemAdminCard({ item }) {
           <p className="text-xs uppercase tracking-wide text-slate-500">
             {item.categoria_principal}{item.subcategoria ? ` / ${item.subcategoria}` : ""}
           </p>
+          <div className="mt-1 flex flex-wrap gap-1.5">
+            <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${PRIORITY_META[priority] || PRIORITY_META.normal}`}>
+              {priority}
+            </span>
+            {isLowStock(item) && item.categoria_principal === "comida" ? (
+              <Link href={`/shopping/comida?search=${encodeURIComponent(item.nombre)}&low_stock=1`} className="rounded-full border border-slate-300 bg-white px-2 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50">
+                Reponer
+              </Link>
+            ) : null}
+          </div>
           <p className="mt-1 text-xs font-medium text-slate-600">NFC: {nfcLabel}</p>
           {nfcUrl ? <p className="mt-1 break-all text-xs text-slate-500">{nfcUrl}</p> : null}
         </div>
@@ -81,9 +101,7 @@ function ItemAdminCard({ item }) {
         >
           Editar item
         </Link>
-        <button className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 hover:bg-rose-100">
-          Eliminar item
-        </button>
+        <DeleteItemControl itemId={item.id} deleteAction={deleteItemAction} />
         <QuantityActions itemId={item.id} />
       </div>
     </article>
@@ -95,7 +113,13 @@ function StatusBanner({ status, id }) {
     return null;
   }
 
-  const message = status === "created" ? `Item ${id} creado correctamente.` : status === "updated" ? `Item ${id} actualizado correctamente.` : "";
+  const message = status === "created"
+    ? `Item ${id} creado correctamente.`
+    : status === "updated"
+      ? `Item ${id} actualizado correctamente.`
+      : status === "deleted"
+        ? `Item ${id} eliminado correctamente.`
+        : "";
 
   if (!message) {
     return null;
@@ -118,6 +142,7 @@ export default async function AdminPage({ searchParams }) {
           <div className="flex flex-wrap gap-2">
             <Link href="/admin/items/new" className="rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">Crear item</Link>
             <Link href="/admin/nfc" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium hover:bg-slate-50">Gestion NFC</Link>
+            <Link href="/shopping/comida" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium hover:bg-slate-50">Modo compra</Link>
             <Link href="/inventory" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium hover:bg-slate-50">Ver inventario</Link>
           </div>
         </div>

@@ -13,6 +13,15 @@ function isActive(pathname, href) {
 function TabIcon({ type, active = false }) {
   const className = active ? "text-slate-900" : "text-slate-500";
 
+  if (type === "shopping") {
+    return (
+      <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M4 7h15l-1.2 9.5a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 9" />
+        <path d="M9 7a3 3 0 0 1 6 0" />
+      </svg>
+    );
+  }
+
   if (type === "quick") {
     return (
       <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -63,7 +72,7 @@ function TabIcon({ type, active = false }) {
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
-  const quickActive = isActive(pathname, "/admin/nfc");
+  const shoppingActive = isActive(pathname, "/shopping");
   const inventoryActive = isActive(pathname, "/inventory");
   const homeActive = isActive(pathname, "/");
   const adminActive = isActive(pathname, "/admin");
@@ -71,9 +80,9 @@ export default function MobileBottomNav() {
   return (
     <div className="ios-bottom-nav md:hidden">
       <div className="ios-bottom-shell">
-        <Link href="/admin/nfc" className={`ios-bottom-tab ${quickActive ? "ios-bottom-tab-active" : ""}`}>
-          <TabIcon type="quick" active={quickActive} />
-          <span>Quick</span>
+        <Link href="/shopping/comida" className={`ios-bottom-tab ${shoppingActive ? "ios-bottom-tab-active" : ""}`}>
+          <TabIcon type="shopping" active={shoppingActive} />
+          <span>Compra</span>
         </Link>
 
         <Link href="/inventory" className={`ios-bottom-tab ${inventoryActive ? "ios-bottom-tab-active" : ""}`}>
@@ -90,12 +99,9 @@ export default function MobileBottomNav() {
           <span>Admin</span>
         </Link>
 
-        <Link href="/admin/items/new" className={`ios-bottom-tab ${isActive(pathname, "/admin/items/new") ? "ios-bottom-tab-active" : ""}`}>
-          <svg viewBox="0 0 24 24" className="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M12 5v14" />
-            <path d="M5 12h14" />
-          </svg>
-          <span>Nuevo</span>
+        <Link href="/admin/nfc" className={`ios-bottom-tab ${isActive(pathname, "/admin/nfc") ? "ios-bottom-tab-active" : ""}`}>
+          <TabIcon type="quick" active={isActive(pathname, "/admin/nfc")} />
+          <span>NFC</span>
         </Link>
       </div>
     </div>

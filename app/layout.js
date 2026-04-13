@@ -23,6 +23,7 @@ export default function RootLayout({ children }) {
               <nav className="hidden flex-wrap items-center gap-2 md:flex">
                 <Link href="/" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Inicio</Link>
                 <Link href="/inventory" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Inventario</Link>
+                <Link href="/shopping/comida" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Compras</Link>
                 <Link href="/admin/nfc" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">NFC</Link>
                 <Link href="/admin" className="rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">Admin</Link>
               </nav>

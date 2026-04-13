@@ -1,7 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { decrementQuantity, incrementQuantity } from "@/lib/inventoryRepository";
+import { redirect } from "next/navigation";
+import { decrementQuantity, deleteItem, incrementQuantity } from "@/lib/inventoryRepository";
 
 function getItemIdFromFormData(formData) {
   const id = formData.get("itemId");
@@ -39,4 +40,11 @@ export async function decrementQuantityAction(formData) {
   const itemId = getItemIdFromFormData(formData);
   await decrementQuantity(itemId);
   revalidateInventoryPaths(itemId);
+}
+
+export async function deleteItemAction(formData) {
+  const itemId = getItemIdFromFormData(formData);
+  await deleteItem(itemId);
+  revalidateInventoryPaths(itemId);
+  redirect(`/admin?status=deleted&id=${encodeURIComponent(itemId)}`);
 }
