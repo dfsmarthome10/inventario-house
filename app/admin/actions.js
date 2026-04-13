@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { decrementQuantity, deleteItem, incrementQuantity } from "@/lib/inventoryRepository";
+import { decrementQuantity, deleteItem, incrementQuantity, updateItem } from "@/lib/inventoryRepository";
 
 function getItemIdFromFormData(formData) {
   const id = formData.get("itemId");
@@ -25,8 +25,10 @@ function revalidateInventoryPaths(itemId) {
   revalidatePath("/inventory/comida/lacena");
   revalidatePath("/inventory/comida/nevera");
   revalidatePath("/inventory/comida/congelador");
+  revalidatePath("/inventory/comida/disponibles");
   revalidatePath("/inventory/cajas");
   revalidatePath("/inventory/herramientas");
+  revalidatePath("/shopping/recommend");
   revalidatePath(`/item/${itemId}`);
 }
 
@@ -47,4 +49,43 @@ export async function deleteItemAction(formData) {
   await deleteItem(itemId);
   revalidateInventoryPaths(itemId);
   redirect(`/admin?status=deleted&id=${encodeURIComponent(itemId)}`);
+}
+
+function getOptionalInteger(formData, key) {
+  const value = formData.get(key);
+
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const parsed = Number(trimmed);
+
+  if (!Number.isFinite(parsed)) {
+    throw new Error(`Invalid number for ${key}`);
+  }
+
+  return Math.max(0, Math.floor(parsed));
+}
+
+export async function disableLowStockAlertAction(formData) {
+  const itemId = getItemIdFromFormData(formData);
+  await updateItem(itemId, { cantidad_minima: null });
+  revalidateInventoryPaths(itemId);
+}
+
+export async function setLowStockThresholdAction(formData) {
+  const itemId = getItemIdFromFormData(formData);
+  const threshold = getOptionalInteger(formData, "cantidadMinima");
+
+  if (threshold === null) {
+    throw new Error("Debes indicar una cantidad minima valida.");
+  }
+
+  await updateItem(itemId, { cantidad_minima: threshold });
+  revalidateInventoryPaths(itemId);
 }

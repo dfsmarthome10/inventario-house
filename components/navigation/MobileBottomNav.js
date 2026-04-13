@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 function isActive(pathname, href) {
   if (href === "/") {
@@ -18,6 +18,17 @@ function TabIcon({ type, active = false }) {
       <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M4 7h15l-1.2 9.5a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 9" />
         <path d="M9 7a3 3 0 0 1 6 0" />
+      </svg>
+    );
+  }
+
+  if (type === "food") {
+    return (
+      <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
+        <rect x="6" y="3.5" width="12" height="17" rx="2.5" />
+        <path d="M6 11.5h12" />
+        <path d="M10 7.5h4" />
+        <path d="M10 15.5h4" />
       </svg>
     );
   }
@@ -64,21 +75,12 @@ function TabIcon({ type, active = false }) {
 }
 
 export default function MobileBottomNav() {
-  const router = useRouter();
   const pathname = usePathname();
   const shoppingActive = isActive(pathname, "/shopping");
   const inventoryActive = isActive(pathname, "/inventory");
   const homeActive = isActive(pathname, "/");
   const adminActive = isActive(pathname, "/admin");
-
-  function handleGoBack() {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back();
-      return;
-    }
-
-    router.push("/inventory/comida");
-  }
+  const foodActive = isActive(pathname, "/inventory/comida/disponibles");
 
   return (
     <div className="ios-bottom-nav md:hidden">
@@ -97,15 +99,15 @@ export default function MobileBottomNav() {
           <TabIcon type="home" active />
         </Link>
 
+        <Link href="/inventory/comida/disponibles" className={`ios-bottom-tab ${foodActive ? "ios-bottom-tab-active" : ""}`}>
+          <TabIcon type="food" active={foodActive} />
+          <span>Nuestra</span>
+        </Link>
+
         <Link href="/admin" className={`ios-bottom-tab ${adminActive ? "ios-bottom-tab-active" : ""}`}>
           <TabIcon type="admin" active={adminActive} />
           <span>Admin</span>
         </Link>
-
-        <button type="button" onClick={handleGoBack} className="ios-bottom-tab">
-          <TabIcon type="back" active={false} />
-          <span>Atras</span>
-        </button>
       </div>
     </div>
   );

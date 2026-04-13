@@ -4,7 +4,7 @@ import DeleteItemControl from "@/components/admin/DeleteItemControl";
 import { getStockPriority, isLowStock } from "@/lib/inventoryFilters";
 import { getItemsByCategory } from "@/lib/inventoryRepository";
 import { buildFullNfcUrl } from "@/lib/nfc";
-import { decrementQuantityAction, deleteItemAction, incrementQuantityAction } from "./actions";
+import { decrementQuantityAction, deleteItemAction, disableLowStockAlertAction, incrementQuantityAction, setLowStockThresholdAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +43,49 @@ function QuantityActions({ itemId }) {
           Cantidad +1
         </button>
       </form>
+    </div>
+  );
+}
+
+function LowStockAlertControls({ item }) {
+  const hasAlert = typeof item.cantidad_minima === "number";
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Alerta de stock bajo</p>
+        <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${hasAlert ? "bg-rose-100 text-rose-700" : "bg-slate-200 text-slate-700"}`}>
+          {hasAlert ? `Activa en <= ${item.cantidad_minima}` : "Desactivada"}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap items-end gap-2">
+        <form action={setLowStockThresholdAction} className="flex flex-wrap items-end gap-2">
+          <input type="hidden" name="itemId" value={item.id} />
+          <label className="flex flex-col gap-1">
+            <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Activar en cantidad</span>
+            <input
+              type="number"
+              name="cantidadMinima"
+              min="0"
+              defaultValue={hasAlert ? item.cantidad_minima : 1}
+              className="w-24 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-slate-900"
+            />
+          </label>
+          <button className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100" type="submit">
+            Guardar alerta
+          </button>
+        </form>
+
+        {hasAlert ? (
+          <form action={disableLowStockAlertAction}>
+            <input type="hidden" name="itemId" value={item.id} />
+            <button className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-100" type="submit">
+              Eliminar alerta
+            </button>
+          </form>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -103,6 +146,10 @@ function ItemAdminCard({ item }) {
         </Link>
         <DeleteItemControl itemId={item.id} deleteAction={deleteItemAction} />
         <QuantityActions itemId={item.id} />
+      </div>
+
+      <div className="mt-3">
+        <LowStockAlertControls item={item} />
       </div>
     </article>
   );
