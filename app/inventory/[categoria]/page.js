@@ -22,6 +22,7 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
   const items = await getAllItems();
   const options = getCategoryOptionsFromItems(items);
   const availableOnly = (searchParams?.available_only || "") === "1";
+  const zoneFilter = typeof searchParams?.subcategoria === "string" ? searchParams.subcategoria : "";
 
   if (!options.mainCategories.includes(categoria)) {
     notFound();
@@ -142,6 +143,31 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
               >
                 Ver solo disponibles
               </Link>
+
+              <span className="ml-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Zona</span>
+              <Link
+                href={buildFoodHubHref({ subcategoria: null })}
+                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                  !zoneFilter
+                    ? "border-cyan-700 bg-cyan-700 text-white"
+                    : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                Todas
+              </Link>
+              {FOOD_SUBCATEGORIES.map((zone) => (
+                <Link
+                  key={`zone-filter-${zone}`}
+                  href={buildFoodHubHref({ subcategoria: zone })}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                    zoneFilter === zone
+                      ? "border-cyan-700 bg-cyan-700 text-white"
+                      : "border-cyan-200 bg-cyan-50 text-cyan-700 hover:bg-cyan-100"
+                  }`}
+                >
+                  {zone}
+                </Link>
+              ))}
             </div>
 
             <FoodFilterBar searchParams={searchParams || {}} clearHref={availableOnly ? "/inventory/comida?available_only=1" : "/inventory/comida"} />

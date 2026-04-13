@@ -2,6 +2,7 @@ export default function FoodFilterBar({ searchParams = {}, clearHref }) {
   return (
     <form method="get" className="rounded-3xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur">
       {searchParams.available_only === "1" ? <input type="hidden" name="available_only" value="1" /> : null}
+      {searchParams.subcategoria ? <input type="hidden" name="subcategoria" value={searchParams.subcategoria} /> : null}
       <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Buscar alimento</span>
