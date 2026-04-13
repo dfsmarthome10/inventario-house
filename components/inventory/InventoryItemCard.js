@@ -1,12 +1,10 @@
 import Link from "next/link";
-import { getThumbnailPreviewUrl } from "@/lib/thumbnailUrl";
+import ThumbnailImage from "@/components/common/ThumbnailImage";
 
 export default function InventoryItemCard({ item }) {
   const quantityLabel = typeof item.cantidad_actual === "number"
     ? `${item.cantidad_actual}${item.unidad ? ` ${item.unidad}` : ""}`
     : "N/A";
-  const thumbnailUrl = getThumbnailPreviewUrl(item.thumbnail_url);
-
   return (
     <Link
       href={`/item/${encodeURIComponent(item.id)}`}
@@ -14,11 +12,11 @@ export default function InventoryItemCard({ item }) {
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          {thumbnailUrl ? (
-            <div className="mb-3 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
-              <img src={thumbnailUrl} alt={`Thumbnail de ${item.nombre}`} className="h-28 w-full object-cover" loading="lazy" />
-            </div>
-          ) : null}
+          <ThumbnailImage
+            src={item.thumbnail_url}
+            label={item.nombre}
+            alt={`Thumbnail de ${item.nombre}`}
+          />
           <p className="text-base font-semibold text-slate-900">{item.nombre}</p>
           <p className="text-sm text-slate-500">{item.alias}</p>
         </div>

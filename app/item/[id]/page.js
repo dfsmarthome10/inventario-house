@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
+import ThumbnailImage from "@/components/common/ThumbnailImage";
 import { getItemById } from "@/lib/inventoryRepository";
 import { buildFullNfcUrl } from "@/lib/nfc";
-import { getThumbnailPreviewUrl } from "@/lib/thumbnailUrl";
 
 export const dynamic = "force-dynamic";
 
@@ -29,16 +29,16 @@ export default async function ItemDetailPage({ params }) {
     notFound();
   }
 
-  const thumbnailUrl = getThumbnailPreviewUrl(item.thumbnail_url);
-
   return (
     <main className="space-y-5">
       <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-        {thumbnailUrl ? (
-          <div className="mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
-            <img src={thumbnailUrl} alt={`Thumbnail de ${item.nombre}`} className="h-44 w-full object-cover" loading="lazy" />
-          </div>
-        ) : null}
+        <ThumbnailImage
+          src={item.thumbnail_url}
+          label={item.nombre}
+          alt={`Thumbnail de ${item.nombre}`}
+          className="h-44 w-full"
+          wrapperClassName="mb-4"
+        />
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{item.nombre}</h1>
