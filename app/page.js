@@ -14,10 +14,9 @@ const CATEGORY_META = {
 export default async function HomePage() {
   const items = await getAllItems();
   const summary = buildInventorySummary(items);
-  const neveraDisponible = items.filter(
+  const comidaDisponible = items.filter(
     (item) =>
       item.categoria_principal === "comida" &&
-      item.subcategoria === "nevera" &&
       typeof item.cantidad_actual === "number" &&
       item.cantidad_actual >= 1
   ).length;
@@ -39,8 +38,8 @@ export default async function HomePage() {
             <p className="mt-1 text-2xl font-semibold text-rose-700">{summary.lowStock.length}</p>
           </div>
           <div className="rounded-2xl bg-emerald-50 p-3">
-            <p className="text-[11px] uppercase tracking-wide text-emerald-600">Nuestra Nevera</p>
-            <p className="mt-1 text-2xl font-semibold text-emerald-800">{neveraDisponible}</p>
+            <p className="text-[11px] uppercase tracking-wide text-emerald-600">Nuestra Comida</p>
+            <p className="mt-1 text-2xl font-semibold text-emerald-800">{comidaDisponible}</p>
           </div>
           <div className="rounded-2xl bg-amber-50 p-3">
             <p className="text-[11px] uppercase tracking-wide text-amber-600">Cajas</p>
