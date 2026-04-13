@@ -22,7 +22,7 @@ export default async function HomePage() {
       <section className="ios-widget-strong">
         <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Inicio</h1>
         <p className="mt-1 text-sm text-slate-600">Panel estilo widget para navegar rapido el inventario del hogar.</p>
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           <div className="rounded-2xl bg-slate-100 p-3">
             <p className="text-[11px] uppercase tracking-wide text-slate-500">Total</p>
             <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.total}</p>
@@ -32,8 +32,12 @@ export default async function HomePage() {
             <p className="mt-1 text-2xl font-semibold text-rose-700">{summary.lowStock.length}</p>
           </div>
           <div className="rounded-2xl bg-emerald-50 p-3">
-            <p className="text-[11px] uppercase tracking-wide text-emerald-600">Comida</p>
-            <p className="mt-1 text-2xl font-semibold text-emerald-800">{summary.byMainCategory.comida || 0}</p>
+            <p className="text-[11px] uppercase tracking-wide text-emerald-600">Nuestra Nevera</p>
+            <p className="mt-1 text-2xl font-semibold text-emerald-800">{summary.foodByZone.nevera || 0}</p>
+          </div>
+          <div className="rounded-2xl bg-amber-50 p-3">
+            <p className="text-[11px] uppercase tracking-wide text-amber-600">Cajas</p>
+            <p className="mt-1 text-2xl font-semibold text-amber-800">{summary.byMainCategory.cajas || 0}</p>
           </div>
           <div className="rounded-2xl bg-sky-50 p-3">
             <p className="text-[11px] uppercase tracking-wide text-sky-600">Herramientas</p>
