@@ -23,6 +23,7 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
   const items = await getAllItems();
   const options = getCategoryOptionsFromItems(items);
   const availableOnly = (searchParams?.available_only || "") === "1";
+  const zoneFilter = searchParams?.subcategoria || "";
 
   if (!options.mainCategories.includes(categoria)) {
     notFound();
@@ -38,6 +39,7 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
   const foodFiltered = availableOnly
     ? foodFilteredBase.filter((item) => typeof item.cantidad_actual === "number" && item.cantidad_actual >= 1)
     : foodFilteredBase;
+  const zonesToRender = FOOD_SUBCATEGORIES.includes(zoneFilter) ? [zoneFilter] : FOOD_SUBCATEGORIES;
 
 
   return (
@@ -100,13 +102,13 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
               </div>
             </div>
 
-            <FoodAvailabilitySection items={foodAll} />
+            <FoodAvailabilitySection items={foodAll} selectedZone={FOOD_SUBCATEGORIES.includes(zoneFilter) ? zoneFilter : null} />
 
             <FoodHubQuickControls />
 
             <FoodFilterBar searchParams={searchParams || {}} clearHref={availableOnly ? "/inventory/comida?available_only=1" : "/inventory/comida"} />
 
-            {FOOD_SUBCATEGORIES.map((zone) => {
+            {zonesToRender.map((zone) => {
               const zoneItems = foodFiltered.filter((item) => item.subcategoria === zone);
               const preview = zoneItems.slice(0, 4);
               const lowStock = zoneItems.filter((item) => isLowStock(item)).length;

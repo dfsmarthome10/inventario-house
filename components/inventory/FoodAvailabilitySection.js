@@ -45,7 +45,7 @@ function ZoneHeader({ title, stats, tone }) {
   );
 }
 
-export default function FoodAvailabilitySection({ items }) {
+export default function FoodAvailabilitySection({ items, selectedZone = null }) {
   const foodItems = items.filter((item) => item.categoria_principal === "comida");
 
   const neveraAll = foodItems.filter((item) => item.subcategoria === "nevera");
@@ -57,6 +57,10 @@ export default function FoodAvailabilitySection({ items }) {
   const lacenaAvailable = sortByName(lacenaAll.filter(hasAvailableStock));
 
   const totalAvailable = neveraAvailable.length + congeladorAvailable.length + lacenaAvailable.length;
+
+  const showNevera = !selectedZone || selectedZone === "nevera";
+  const showCongelador = !selectedZone || selectedZone === "congelador";
+  const showLacena = !selectedZone || selectedZone === "lacena";
 
   return (
     <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
@@ -74,44 +78,52 @@ export default function FoodAvailabilitySection({ items }) {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
-        <div className="rounded-3xl border border-sky-200 bg-sky-50 p-3">
-          <div className="rounded-2xl border border-sky-300/80 bg-white/70 p-3">
-            <ZoneHeader title="Nevera (arriba)" stats={zoneStats(neveraAll, neveraAvailable)} tone="text-sky-700" />
-            {neveraAvailable.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-sky-200 bg-white px-3 py-3 text-xs text-slate-500">No hay alimentos disponibles en nevera.</p>
-            ) : (
-              <div className="grid max-h-56 gap-2 overflow-auto pr-1 sm:grid-cols-2">
-                {neveraAvailable.map((item) => <AvailabilityChip key={item.id} item={item} />)}
+        {(showNevera || showCongelador) ? (
+          <div className="rounded-3xl border border-sky-200 bg-sky-50 p-3">
+            {showNevera ? (
+              <div className="rounded-2xl border border-sky-300/80 bg-white/70 p-3">
+                <ZoneHeader title="Nevera (arriba)" stats={zoneStats(neveraAll, neveraAvailable)} tone="text-sky-700" />
+                {neveraAvailable.length === 0 ? (
+                  <p className="rounded-xl border border-dashed border-sky-200 bg-white px-3 py-3 text-xs text-slate-500">No hay alimentos disponibles en nevera.</p>
+                ) : (
+                  <div className="grid max-h-56 gap-2 overflow-auto pr-1 sm:grid-cols-2">
+                    {neveraAvailable.map((item) => <AvailabilityChip key={item.id} item={item} />)}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            ) : null}
 
-          <div className="my-3 h-px bg-sky-200" />
+            {showNevera && showCongelador ? <div className="my-3 h-px bg-sky-200" /> : null}
 
-          <div className="rounded-2xl border border-indigo-300/80 bg-indigo-50/70 p-3">
-            <ZoneHeader title="Congelador (abajo)" stats={zoneStats(congeladorAll, congeladorAvailable)} tone="text-indigo-700" />
-            {congeladorAvailable.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-indigo-200 bg-white px-3 py-3 text-xs text-slate-500">No hay alimentos disponibles en congelador.</p>
-            ) : (
-              <div className="grid max-h-56 gap-2 overflow-auto pr-1 sm:grid-cols-2">
-                {congeladorAvailable.map((item) => <AvailabilityChip key={item.id} item={item} />)}
+            {showCongelador ? (
+              <div className="rounded-2xl border border-indigo-300/80 bg-indigo-50/70 p-3">
+                <ZoneHeader title="Congelador (abajo)" stats={zoneStats(congeladorAll, congeladorAvailable)} tone="text-indigo-700" />
+                {congeladorAvailable.length === 0 ? (
+                  <p className="rounded-xl border border-dashed border-indigo-200 bg-white px-3 py-3 text-xs text-slate-500">No hay alimentos disponibles en congelador.</p>
+                ) : (
+                  <div className="grid max-h-56 gap-2 overflow-auto pr-1 sm:grid-cols-2">
+                    {congeladorAvailable.map((item) => <AvailabilityChip key={item.id} item={item} />)}
+                  </div>
+                )}
               </div>
-            )}
+            ) : null}
           </div>
-        </div>
+        ) : null}
 
-        <div className="rounded-3xl border border-amber-200 bg-amber-50 p-3">
-          <div className="rounded-2xl border border-amber-300/80 bg-white/70 p-3">
-            <ZoneHeader title="Lacena" stats={zoneStats(lacenaAll, lacenaAvailable)} tone="text-amber-700" />
-            {lacenaAvailable.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-amber-200 bg-white px-3 py-3 text-xs text-slate-500">No hay alimentos disponibles en lacena.</p>
-            ) : (
-              <div className="grid max-h-[30rem] gap-2 overflow-auto pr-1 sm:grid-cols-2">
-                {lacenaAvailable.map((item) => <AvailabilityChip key={item.id} item={item} />)}
-              </div>
-            )}
+        {showLacena ? (
+          <div className="rounded-3xl border border-amber-200 bg-amber-50 p-3">
+            <div className="rounded-2xl border border-amber-300/80 bg-white/70 p-3">
+              <ZoneHeader title="Lacena" stats={zoneStats(lacenaAll, lacenaAvailable)} tone="text-amber-700" />
+              {lacenaAvailable.length === 0 ? (
+                <p className="rounded-xl border border-dashed border-amber-200 bg-white px-3 py-3 text-xs text-slate-500">No hay alimentos disponibles en lacena.</p>
+              ) : (
+                <div className="grid max-h-[30rem] gap-2 overflow-auto pr-1 sm:grid-cols-2">
+                  {lacenaAvailable.map((item) => <AvailabilityChip key={item.id} item={item} />)}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </section>
   );
