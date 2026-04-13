@@ -28,6 +28,7 @@ const ZONE_META = {
 
 export default async function FoodZonePage({ params, searchParams }) {
   const zone = params.zona;
+  const availableOnly = (searchParams?.available_only || "") === "1";
 
   if (!FOOD_SUBCATEGORIES.includes(zone)) {
     notFound();
@@ -35,9 +36,12 @@ export default async function FoodZonePage({ params, searchParams }) {
 
   const items = await getAllItems();
   const zoneItems = items.filter((item) => item.categoria_principal === "comida" && item.subcategoria === zone);
-  const filtered = applyInventoryFilters(zoneItems, {
+  const filteredBase = applyInventoryFilters(zoneItems, {
     ...(searchParams || {}),
   });
+  const filtered = availableOnly
+    ? filteredBase.filter((item) => typeof item.cantidad_actual === "number" && item.cantidad_actual >= 1)
+    : filteredBase;
   const lowStockCount = zoneItems.filter((item) => isLowStock(item)).length;
   const criticalCount = zoneItems.filter((item) => getStockPriority(item) === "critical").length;
   const mediumCount = zoneItems.filter((item) => getStockPriority(item) === "medium").length;
@@ -72,6 +76,38 @@ export default async function FoodZonePage({ params, searchParams }) {
         <div className="mt-4">
           <FoodZonePills activeZone={zone} />
         </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Vista</span>
+          <Link
+            href={`/inventory/comida/${zone}${(() => {
+              const p = new URLSearchParams();
+              if (searchParams?.search) p.set("search", searchParams.search);
+              if (searchParams?.low_stock === "1") p.set("low_stock", "1");
+              const q = p.toString();
+              return q ? `?${q}` : "";
+            })()}`}
+            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+              !availableOnly ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            Ver todo
+          </Link>
+          <Link
+            href={`/inventory/comida/${zone}${(() => {
+              const p = new URLSearchParams();
+              if (searchParams?.search) p.set("search", searchParams.search);
+              if (searchParams?.low_stock === "1") p.set("low_stock", "1");
+              p.set("available_only", "1");
+              const q = p.toString();
+              return q ? `?${q}` : "";
+            })()}`}
+            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+              availableOnly ? "border-emerald-700 bg-emerald-700 text-white" : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+            }`}
+          >
+            Ver solo disponibles
+          </Link>
+        </div>
         <div className="mt-3">
           <Link href={`/shopping/comida?subcategoria=${encodeURIComponent(zone)}&low_stock=1`} className="inline-flex rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
             Ver solo bajos y reponer
@@ -79,7 +115,10 @@ export default async function FoodZonePage({ params, searchParams }) {
         </div>
       </section>
 
-      <FoodFilterBar searchParams={searchParams || {}} clearHref={`/inventory/comida/${zone}`} />
+      <FoodFilterBar
+        searchParams={searchParams || {}}
+        clearHref={availableOnly ? `/inventory/comida/${zone}?available_only=1` : `/inventory/comida/${zone}`}
+      />
 
       <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
         <div className="mb-3 flex items-center justify-between">

@@ -21,6 +21,7 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
   const categoria = params.categoria;
   const items = await getAllItems();
   const options = getCategoryOptionsFromItems(items);
+  const availableOnly = (searchParams?.available_only || "") === "1";
 
   if (!options.mainCategories.includes(categoria)) {
     notFound();
@@ -31,8 +32,31 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
     categoria_principal: categoria,
   };
   const filtered = applyInventoryFilters(items, filters);
-  const foodFiltered = filtered.filter((item) => item.categoria_principal === "comida");
+  const foodFilteredBase = filtered.filter((item) => item.categoria_principal === "comida");
   const foodAll = items.filter((item) => item.categoria_principal === "comida");
+  const foodFiltered = availableOnly
+    ? foodFilteredBase.filter((item) => typeof item.cantidad_actual === "number" && item.cantidad_actual >= 1)
+    : foodFilteredBase;
+
+  const buildFoodHubHref = (extra = {}) => {
+    const paramsObj = new URLSearchParams();
+    const current = searchParams || {};
+
+    if (current.search) paramsObj.set("search", current.search);
+    if (current.low_stock === "1") paramsObj.set("low_stock", "1");
+    if (availableOnly) paramsObj.set("available_only", "1");
+
+    Object.entries(extra).forEach(([k, v]) => {
+      if (v === null) {
+        paramsObj.delete(k);
+      } else if (v !== undefined && v !== "") {
+        paramsObj.set(k, String(v));
+      }
+    });
+
+    const query = paramsObj.toString();
+    return `/inventory/comida${query ? `?${query}` : ""}`;
+  };
 
   return (
     <main className="space-y-4">
@@ -96,7 +120,31 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
 
             <FoodAvailabilitySection items={foodAll} />
 
-            <FoodFilterBar searchParams={searchParams || {}} clearHref="/inventory/comida" />
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Vista</span>
+              <Link
+                href={buildFoodHubHref({ available_only: null })}
+                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                  !availableOnly
+                    ? "border-slate-900 bg-slate-900 text-white"
+                    : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                Ver todo
+              </Link>
+              <Link
+                href={buildFoodHubHref({ available_only: "1" })}
+                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                  availableOnly
+                    ? "border-emerald-700 bg-emerald-700 text-white"
+                    : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                }`}
+              >
+                Ver solo disponibles
+              </Link>
+            </div>
+
+            <FoodFilterBar searchParams={searchParams || {}} clearHref={availableOnly ? "/inventory/comida?available_only=1" : "/inventory/comida"} />
 
             {FOOD_SUBCATEGORIES.map((zone) => {
               const zoneItems = foodFiltered.filter((item) => item.subcategoria === zone);
@@ -115,7 +163,14 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
                     </div>
                     <div className="flex gap-2">
                       <Link
-                        href={`/inventory/comida/${zone}${searchParams?.search ? `?search=${encodeURIComponent(searchParams.search)}` : ""}${searchParams?.low_stock === "1" ? `${searchParams?.search ? "&" : "?"}low_stock=1` : ""}`}
+                        href={`/inventory/comida/${zone}${(() => {
+                          const p = new URLSearchParams();
+                          if (searchParams?.search) p.set("search", searchParams.search);
+                          if (searchParams?.low_stock === "1") p.set("low_stock", "1");
+                          if (availableOnly) p.set("available_only", "1");
+                          const q = p.toString();
+                          return q ? `?${q}` : "";
+                        })()}`}
                         className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
                       >
                         Abrir zona
