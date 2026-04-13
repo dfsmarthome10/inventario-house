@@ -14,6 +14,13 @@ const CATEGORY_META = {
 export default async function HomePage() {
   const items = await getAllItems();
   const summary = buildInventorySummary(items);
+  const neveraDisponible = items.filter(
+    (item) =>
+      item.categoria_principal === "comida" &&
+      item.subcategoria === "nevera" &&
+      typeof item.cantidad_actual === "number" &&
+      item.cantidad_actual >= 1
+  ).length;
   const customCategories = Object.keys(summary.byMainCategory).filter((key) => !Object.prototype.hasOwnProperty.call(CATEGORY_META, key));
   const topLowStock = summary.lowStock.slice(0, 3);
 
@@ -33,13 +40,13 @@ export default async function HomePage() {
           </div>
           <div className="rounded-2xl bg-emerald-50 p-3">
             <p className="text-[11px] uppercase tracking-wide text-emerald-600">Nuestra Nevera</p>
-            <p className="mt-1 text-2xl font-semibold text-emerald-800">{summary.foodByZone.nevera || 0}</p>
+            <p className="mt-1 text-2xl font-semibold text-emerald-800">{neveraDisponible}</p>
           </div>
           <div className="rounded-2xl bg-amber-50 p-3">
             <p className="text-[11px] uppercase tracking-wide text-amber-600">Cajas</p>
             <p className="mt-1 text-2xl font-semibold text-amber-800">{summary.byMainCategory.cajas || 0}</p>
           </div>
-          <div className="rounded-2xl bg-sky-50 p-3">
+          <div className="col-span-2 rounded-2xl bg-sky-50 p-3 sm:col-span-1">
             <p className="text-[11px] uppercase tracking-wide text-sky-600">Herramientas</p>
             <p className="mt-1 text-2xl font-semibold text-sky-800">{summary.byMainCategory.herramientas || 0}</p>
           </div>
