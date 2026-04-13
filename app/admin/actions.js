@@ -28,6 +28,7 @@ function revalidateInventoryPaths(itemId) {
   revalidatePath("/inventory/comida/disponibles");
   revalidatePath("/inventory/cajas");
   revalidatePath("/inventory/herramientas");
+  revalidatePath("/shopping/comida");
   revalidatePath("/shopping/recommend");
   revalidatePath(`/item/${itemId}`);
 }
@@ -46,9 +47,15 @@ export async function decrementQuantityAction(formData) {
 
 export async function deleteItemAction(formData) {
   const itemId = getItemIdFromFormData(formData);
-  await deleteItem(itemId);
-  revalidateInventoryPaths(itemId);
-  redirect(`/admin?status=deleted&id=${encodeURIComponent(itemId)}`);
+
+  try {
+    await deleteItem(itemId);
+    revalidateInventoryPaths(itemId);
+    redirect(`/admin?status=deleted&id=${encodeURIComponent(itemId)}`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "delete_failed";
+    redirect(`/admin?status=delete_error&id=${encodeURIComponent(itemId)}&reason=${encodeURIComponent(message)}`);
+  }
 }
 
 function getOptionalInteger(formData, key) {

@@ -166,10 +166,16 @@ function StatusBanner({ status, id }) {
       ? `Item ${id} actualizado correctamente.`
       : status === "deleted"
         ? `Item ${id} eliminado correctamente.`
+        : status === "delete_error"
+          ? `No se pudo eliminar ${id}. Si estaba en carrito, ya se limpio referencia; intenta de nuevo.`
         : "";
 
   if (!message) {
     return null;
+  }
+
+  if (status === "delete_error") {
+    return <p className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{message}</p>;
   }
 
   return <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{message}</p>;
