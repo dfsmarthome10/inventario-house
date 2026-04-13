@@ -72,6 +72,12 @@ export async function generateRecommendationAction(formData) {
     if (message.includes("OPENAI_API_KEY")) {
       redirect(`/shopping/recommend?status=missing_openai_key`);
     }
+    if (message.includes("OPENAI_AUTH_ERROR")) {
+      redirect(`/shopping/recommend?status=openai_auth_error`);
+    }
+    if (message.includes("OPENAI_QUOTA_ERROR")) {
+      redirect(`/shopping/recommend?status=openai_quota_error`);
+    }
     redirect(`/shopping/recommend?status=generation_error`);
   }
 }

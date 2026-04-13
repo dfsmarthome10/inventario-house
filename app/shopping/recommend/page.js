@@ -36,6 +36,14 @@ function StatusBanner({ status }) {
     return <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">Falta OPENAI_API_KEY en variables de entorno del servidor.</div>;
   }
 
+  if (status === "openai_auth_error") {
+    return <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">La clave de OpenAI no es valida o no tiene permisos para Responses API.</div>;
+  }
+
+  if (status === "openai_quota_error") {
+    return <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">OpenAI devolvio limite/cuota. Revisa billing o vuelve a intentar luego.</div>;
+  }
+
   if (status === "generation_error") {
     return <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">No se pudo generar la recomendacion en este momento.</div>;
   }
@@ -122,7 +130,7 @@ export default async function ShoppingRecommendPage({ searchParams }) {
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{line.item_name}</p>
-                    <p className="text-xs text-slate-500">{line.item_id || "Sin ID"} · prioridad {line.priority || "media"}</p>
+                    <p className="text-xs text-slate-500">{line.item_id || "Sin ID"} - prioridad {line.priority || "media"}</p>
                     <p className="mt-1 text-xs text-slate-600">{line.rationale}</p>
                   </div>
                   <div className="text-right">
