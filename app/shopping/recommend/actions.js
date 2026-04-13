@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect";
 import { sendHomeAssistantEvent } from "@/lib/homeAssistantEvents";
 import { getAllItems } from "@/lib/inventoryRepository";
 import { generateShoppingRecommendation } from "@/lib/openaiShoppingRecommendations";
@@ -68,7 +69,17 @@ export async function generateRecommendationAction(formData) {
     revalidatePath("/shopping/recommend");
     redirect(`/shopping/recommend?run=${encodeURIComponent(run.id)}`);
   } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
     const message = error instanceof Error ? error.message : "Recommendation failed";
+    console.error("[generateRecommendationAction] recommendation failed", {
+      mode,
+      message,
+      stack: error instanceof Error ? error.stack : null,
+    });
+
     if (message.includes("OPENAI_API_KEY")) {
       redirect(`/shopping/recommend?status=missing_openai_key`);
     }
