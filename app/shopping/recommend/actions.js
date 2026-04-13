@@ -78,6 +78,12 @@ export async function generateRecommendationAction(formData) {
     if (message.includes("OPENAI_QUOTA_ERROR")) {
       redirect(`/shopping/recommend?status=openai_quota_error`);
     }
+    if (message.includes("OPENAI_TIMEOUT_ERROR")) {
+      redirect(`/shopping/recommend?status=openai_timeout_error`);
+    }
+    if (message.includes("OPENAI_PARSE_ERROR")) {
+      redirect(`/shopping/recommend?status=openai_parse_error`);
+    }
     redirect(`/shopping/recommend?status=generation_error`);
   }
 }

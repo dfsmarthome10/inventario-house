@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { formatDateTime } from "@/lib/formatters";
 import { getRecommendationRunById } from "@/lib/shoppingRepository";
+import RecommendSubmitButton from "@/components/shopping/RecommendSubmitButton";
 import { addRecommendationLineToCartAction, generateRecommendationAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -42,6 +43,14 @@ function StatusBanner({ status }) {
 
   if (status === "openai_quota_error") {
     return <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">OpenAI devolvio limite/cuota. Revisa billing o vuelve a intentar luego.</div>;
+  }
+
+  if (status === "openai_timeout_error") {
+    return <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">La recomendacion tardo demasiado. Intenta de nuevo en unos segundos.</div>;
+  }
+
+  if (status === "openai_parse_error") {
+    return <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">OpenAI respondio en formato no valido. Vuelve a generar.</div>;
   }
 
   if (status === "generation_error") {
@@ -97,9 +106,7 @@ export default async function ShoppingRecommendPage({ searchParams }) {
               <input type="hidden" name="mode" value={mode} />
               <h3 className="text-sm font-semibold text-slate-900">{meta.title}</h3>
               <p className="mt-1 text-xs text-slate-600">{meta.description}</p>
-              <button type="submit" className="mt-3 rounded-xl bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
-                Generar
-              </button>
+              <RecommendSubmitButton />
             </form>
           ))}
         </div>
