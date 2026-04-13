@@ -4,6 +4,7 @@ import InventoryItemCard from "@/components/inventory/InventoryItemCard";
 import InventoryFilterBar from "@/components/inventory/InventoryFilterBar";
 import FoodFilterBar from "@/components/inventory/FoodFilterBar";
 import FoodZonePills from "@/components/inventory/FoodZonePills";
+import FoodAvailabilitySection from "@/components/inventory/FoodAvailabilitySection";
 import { FOOD_SUBCATEGORIES, applyInventoryFilters, getCategoryOptionsFromItems, getStockPriority, isLowStock } from "@/lib/inventoryFilters";
 import { getAllItems } from "@/lib/inventoryRepository";
 
@@ -92,6 +93,8 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
                 </div>
               </div>
             </div>
+
+            <FoodAvailabilitySection items={foodAll} />
 
             <FoodFilterBar searchParams={searchParams || {}} clearHref="/inventory/comida" />
 
