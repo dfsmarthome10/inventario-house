@@ -106,6 +106,10 @@ export default async function ShoppingRecommendPage({ searchParams }) {
               <input type="hidden" name="mode" value={mode} />
               <h3 className="text-sm font-semibold text-slate-900">{meta.title}</h3>
               <p className="mt-1 text-xs text-slate-600">{meta.description}</p>
+              <label className="mt-3 flex items-center gap-2 rounded-xl border border-white/80 bg-white/80 px-3 py-2 text-xs text-slate-700">
+                <input type="checkbox" name="focus_common" value="1" defaultChecked className="h-4 w-4 rounded border-slate-300" />
+                <span>Priorizar items mas comunes segun historial</span>
+              </label>
               <RecommendSubmitButton />
             </form>
           ))}

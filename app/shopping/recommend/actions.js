@@ -6,7 +6,7 @@ import { isRedirectError } from "next/dist/client/components/redirect";
 import { sendHomeAssistantEvent } from "@/lib/homeAssistantEvents";
 import { getAllItems } from "@/lib/inventoryRepository";
 import { generateShoppingRecommendation } from "@/lib/openaiShoppingRecommendations";
-import { createRecommendationRun, getOrCreateOpenFoodSession, upsertCartLine } from "@/lib/shoppingRepository";
+import { createRecommendationRun, getFoodPurchaseSignals, getOrCreateOpenFoodSession, upsertCartLine } from "@/lib/shoppingRepository";
 
 const ALLOWED_MODES = ["compra_completa", "compra_budget", "compra_encargos"];
 
@@ -26,6 +26,14 @@ function getMode(formData) {
   return mode;
 }
 
+function getBooleanValue(formData, key, defaultValue = false) {
+  const value = formData.get(key);
+  if (value === null || value === undefined) {
+    return defaultValue;
+  }
+  return value === "1" || value === "true" || value === "on";
+}
+
 function foodSnapshot(items) {
   return items
     .filter((item) => item.categoria_principal === "comida")
@@ -41,9 +49,11 @@ function foodSnapshot(items) {
 
 export async function generateRecommendationAction(formData) {
   const mode = getMode(formData);
+  const focusCommon = getBooleanValue(formData, "focus_common", true);
   try {
     const inventory = await getAllItems();
     const snapshot = foodSnapshot(inventory);
+    const purchaseSignals = await getFoodPurchaseSignals(120);
 
     if (snapshot.length === 0) {
       redirect(`/shopping/recommend?status=empty_inventory&mode=${encodeURIComponent(mode)}`);
@@ -52,6 +62,8 @@ export async function generateRecommendationAction(formData) {
     const recommendation = await generateShoppingRecommendation({
       mode,
       catalog: snapshot,
+      purchaseSignals,
+      focusCommon,
     });
 
     const run = await createRecommendationRun({
@@ -63,6 +75,7 @@ export async function generateRecommendationAction(formData) {
     await sendHomeAssistantEvent("recommendation_generated", {
       recommendation_run_id: run.id,
       mode,
+      focus_common: focusCommon,
       suggestion_count: Array.isArray(recommendation.suggestions) ? recommendation.suggestions.length : 0,
     });
 

@@ -26,6 +26,26 @@ button {
     @apply rounded-3xl border border-slate-200 bg-white p-5 shadow-md;
   }
 
+  .ios-top-menu-trigger {
+    @apply inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50;
+  }
+
+  .ios-top-menu-panel {
+    @apply absolute right-0 top-14 z-40 w-56 rounded-3xl border border-white/80 bg-white/95 p-2 shadow-xl backdrop-blur-xl;
+    box-shadow:
+      0 14px 30px rgba(15, 23, 42, 0.16),
+      0 2px 8px rgba(15, 23, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+
+  .ios-top-menu-link {
+    @apply block rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100;
+  }
+
+  .ios-top-menu-link-active {
+    @apply bg-slate-900 text-white hover:bg-slate-800;
+  }
+
   .ios-bottom-nav {
     position: fixed;
     left: 0;

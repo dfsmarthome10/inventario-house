@@ -1,6 +1,7 @@
 import "./globals.css";
 import Link from "next/link";
 import MobileBottomNav from "@/components/navigation/MobileBottomNav";
+import MobileTopMenu from "@/components/navigation/MobileTopMenu";
 
 export const metadata = {
   title: "Inventory House NFC",
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
                 </Link>
                 <p className="mt-1 px-2 text-sm text-slate-600">Inventario NFC del hogar con estructura premium para despliegue.</p>
               </div>
+              <MobileTopMenu />
               <nav className="hidden flex-wrap items-center gap-2 md:flex">
                 <Link href="/" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Inicio</Link>
                 <Link href="/inventory" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Inventario</Link>
