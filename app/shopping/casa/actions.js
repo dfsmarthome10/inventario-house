@@ -67,7 +67,10 @@ function normalizeText(value) {
 
 function revalidateShoppingPaths() {
   revalidatePath("/shopping");
+  revalidatePath("/shopping/comida");
+  revalidatePath("/shopping/comida/cart");
   revalidatePath("/shopping/casa");
+  revalidatePath("/shopping/casa/cart");
   revalidatePath("/shopping/history");
   revalidatePath("/shopping/history/calendar");
 }

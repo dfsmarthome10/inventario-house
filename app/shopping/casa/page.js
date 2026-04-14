@@ -1,5 +1,6 @@
 import Link from "next/link";
-import ShoppingCartPanel from "@/components/shopping/ShoppingCartPanel";
+import ShoppingCartSummaryCard from "@/components/shopping/ShoppingCartSummaryCard";
+import QuickCartDrawer from "@/components/shopping/QuickCartDrawer";
 import ThumbnailImage from "@/components/common/ThumbnailImage";
 import { getOrCreateOpenHouseSession, getHouseCatalog, getSessionCart } from "@/lib/shoppingRepository";
 import { getHouseSubcategoryLabel, HOUSE_SUBCATEGORIES } from "@/lib/house";
@@ -115,6 +116,19 @@ export default async function ShoppingCasaPage({ searchParams }) {
             <Link href="/shopping/history?scope=casa" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Historial casa
             </Link>
+            <Link href="/shopping/casa/cart" className="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+              Ver carrito
+            </Link>
+            <QuickCartDrawer
+              scopeLabel="Casa"
+              scopeTone="bg-cyan-100 text-cyan-700"
+              lines={cart.lines}
+              updateLineAction={updateCasaCartLineAction}
+              removeLineAction={removeCasaCartLineAction}
+              confirmPurchaseAction={confirmCasaPurchaseAction}
+              fullCartHref="/shopping/casa/cart"
+              continueHref="/shopping/casa"
+            />
             <span className="rounded-xl border border-cyan-200 bg-cyan-50 px-3 py-2 text-xs font-semibold text-cyan-700">Sesion {session.id}</span>
           </div>
         </div>
@@ -292,11 +306,12 @@ export default async function ShoppingCasaPage({ searchParams }) {
           )}
         </div>
 
-        <ShoppingCartPanel
-          lines={cart.lines}
-          updateLineAction={updateCasaCartLineAction}
-          removeLineAction={removeCasaCartLineAction}
-          confirmPurchaseAction={confirmCasaPurchaseAction}
+        <ShoppingCartSummaryCard
+          scopeLabel="Casa"
+          scopeTone="bg-cyan-100 text-cyan-700"
+          cart={cart}
+          cartHref="/shopping/casa/cart"
+          continueHref="/shopping/casa"
         />
       </section>
     </main>

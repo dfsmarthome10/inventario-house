@@ -1,5 +1,6 @@
 import Link from "next/link";
-import ShoppingCartPanel from "@/components/shopping/ShoppingCartPanel";
+import ShoppingCartSummaryCard from "@/components/shopping/ShoppingCartSummaryCard";
+import QuickCartDrawer from "@/components/shopping/QuickCartDrawer";
 import ThumbnailImage from "@/components/common/ThumbnailImage";
 import { getFoodCatalog, getOrCreateOpenFoodSession, getSessionCart } from "@/lib/shoppingRepository";
 import { addToCartAction, confirmPurchaseAction, createFoodItemFromShoppingAction, removeCartLineAction, updateCartLineAction } from "./actions";
@@ -129,6 +130,19 @@ export default async function ShoppingFoodPage({ searchParams }) {
             <Link href="/shopping/recommend" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Recomendar
             </Link>
+            <Link href="/shopping/comida/cart" className="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+              Ver carrito
+            </Link>
+            <QuickCartDrawer
+              scopeLabel="Comida"
+              scopeTone="bg-emerald-100 text-emerald-700"
+              lines={cart.lines}
+              updateLineAction={updateCartLineAction}
+              removeLineAction={removeCartLineAction}
+              confirmPurchaseAction={confirmPurchaseAction}
+              fullCartHref="/shopping/comida/cart"
+              continueHref="/shopping/comida"
+            />
             <span className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700">
               Sesion {session.id}
             </span>
@@ -310,11 +324,12 @@ export default async function ShoppingFoodPage({ searchParams }) {
           )}
         </div>
 
-        <ShoppingCartPanel
-          lines={cart.lines}
-          updateLineAction={updateCartLineAction}
-          removeLineAction={removeCartLineAction}
-          confirmPurchaseAction={confirmPurchaseAction}
+        <ShoppingCartSummaryCard
+          scopeLabel="Comida"
+          scopeTone="bg-emerald-100 text-emerald-700"
+          cart={cart}
+          cartHref="/shopping/comida/cart"
+          continueHref="/shopping/comida"
         />
       </section>
     </main>

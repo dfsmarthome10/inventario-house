@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { formatCurrency, toMoneyNumber } from "@/lib/formatters";
+import Link from "next/link";
 
 function SaveLineButton() {
   const { pending } = useFormStatus();
@@ -46,7 +47,19 @@ function ConfirmPurchaseButton() {
   );
 }
 
-export default function ShoppingCartPanel({ lines, updateLineAction, removeLineAction, confirmPurchaseAction }) {
+export default function ShoppingCartPanel({
+  lines,
+  updateLineAction,
+  removeLineAction,
+  confirmPurchaseAction,
+  heading = "Carrito de compra",
+  subtitle = "",
+  scopeBadge = "",
+  continueShoppingHref = "",
+  switchScopeHref = "",
+  switchScopeLabel = "",
+  stickyTotals = false,
+}) {
   const [draft, setDraft] = useState(() =>
     Object.fromEntries(
       lines.map((line) => [
@@ -94,10 +107,28 @@ export default function ShoppingCartPanel({ lines, updateLineAction, removeLineA
   if (lines.length === 0) {
     return (
       <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold tracking-tight text-slate-900">Carrito de compra</h2>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight text-slate-900">{heading}</h2>
+            {subtitle ? <p className="mt-1 text-sm text-slate-600">{subtitle}</p> : null}
+          </div>
+          {scopeBadge ? <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">{scopeBadge}</span> : null}
+        </div>
         <div className="mt-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5 text-center">
           <p className="text-sm font-medium text-slate-700">Tu carrito esta vacio.</p>
           <p className="mt-1 text-sm text-slate-500">Agrega items desde el catalogo para iniciar la compra.</p>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {continueShoppingHref ? (
+            <Link href={continueShoppingHref} className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+              Seguir comprando
+            </Link>
+          ) : null}
+          {switchScopeHref && switchScopeLabel ? (
+            <Link href={switchScopeHref} className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+              {switchScopeLabel}
+            </Link>
+          ) : null}
         </div>
       </section>
     );
@@ -106,8 +137,26 @@ export default function ShoppingCartPanel({ lines, updateLineAction, removeLineA
   return (
     <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold tracking-tight text-slate-900">Carrito de compra</h2>
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight text-slate-900">{heading}</h2>
+          {subtitle ? <p className="mt-1 text-sm text-slate-600">{subtitle}</p> : null}
+        </div>
+        {scopeBadge ? <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">{scopeBadge}</span> : null}
+      </div>
+      <div className="mb-4 flex items-center justify-between">
         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">{lines.length} lineas</span>
+        <div className="flex flex-wrap gap-2">
+          {continueShoppingHref ? (
+            <Link href={continueShoppingHref} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+              Seguir comprando
+            </Link>
+          ) : null}
+          {switchScopeHref && switchScopeLabel ? (
+            <Link href={switchScopeHref} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+              {switchScopeLabel}
+            </Link>
+          ) : null}
+        </div>
       </div>
 
       <div className="space-y-3">
@@ -203,7 +252,7 @@ export default function ShoppingCartPanel({ lines, updateLineAction, removeLineA
         ))}
       </div>
 
-      <div className="mt-4 rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-4">
+      <div className={`mt-4 rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-4 ${stickyTotals ? "md:sticky md:top-24" : ""}`}>
         <div className="flex items-start justify-between gap-2 border-b border-emerald-100 pb-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">Resumen de compra</p>
