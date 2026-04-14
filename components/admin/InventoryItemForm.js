@@ -46,6 +46,21 @@ export default function InventoryItemForm({
   mainCategoryOptions = MAIN_CATEGORY_OPTIONS.map((opt) => opt.value),
   foodSubcategoryOptions = FOOD_SUBCATEGORY_OPTIONS.map((opt) => opt.value),
 }) {
+  const initialExpirationDatesText = Array.isArray(initialValues.expiration_dates)
+    ? initialValues.expiration_dates
+        .map((entry) => {
+          const date = (entry?.expires_on || "").toString().trim();
+          if (!date) {
+            return "";
+          }
+          const quantity = entry?.quantity === null || entry?.quantity === undefined ? "" : `${entry.quantity}`;
+          const note = (entry?.note || "").toString().trim();
+          return [date, quantity, note].filter((part) => part !== "").join(" | ");
+        })
+        .filter(Boolean)
+        .join("\n")
+    : "";
+
   const initialState = {
     errors: {},
     values: {
@@ -61,6 +76,8 @@ export default function InventoryItemForm({
       cantidad_minima_text: initialValues.cantidad_minima ?? "",
       unidad: initialValues.unidad || "",
       thumbnail_url: initialValues.thumbnail_url || "",
+      expiration_enabled: Boolean(initialValues.expiration_enabled),
+      expiration_dates_text: initialExpirationDatesText,
       nfc_mode: initialValues.nfc_mode || "none",
       nfc_tag_uid: initialValues.nfc_tag_uid || "",
       zone_key: initialValues.zone_key || "",
@@ -74,6 +91,7 @@ export default function InventoryItemForm({
   const [selectedSubcategory, setSelectedSubcategory] = useState(values.subcategoria || "");
   const [nfcMode, setNfcMode] = useState(values.nfc_mode || "none");
   const [zoneKey, setZoneKey] = useState(values.zone_key || values.subcategoria || "");
+  const [expirationEnabled, setExpirationEnabled] = useState(Boolean(values.expiration_enabled));
 
   const nfcTargetPath = useMemo(() => {
     if (nfcMode === "item") {
@@ -201,6 +219,45 @@ export default function InventoryItemForm({
           <p className="mt-1 text-xs text-slate-500">No se suben archivos. Solo se guarda una URL externa.</p>
           <ErrorText text={state?.errors?.thumbnail_url} />
         </label>
+
+        {selectedMainCategory === "comida" ? (
+          <div className="sm:col-span-2 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Fechas de expiracion</p>
+                <p className="mt-1 text-xs text-slate-600">Activa solo para alimentos que quieres monitorear por lote.</p>
+              </div>
+              <label className="flex items-center gap-2 rounded-xl border border-white bg-white px-3 py-2">
+                <input
+                  type="checkbox"
+                  name="expiration_enabled"
+                  value="1"
+                  defaultChecked={Boolean(values.expiration_enabled)}
+                  onChange={(event) => setExpirationEnabled(event.target.checked)}
+                  className="h-4 w-4 rounded border-slate-300"
+                />
+                <span className="text-sm font-medium text-slate-700">Activar expiracion</span>
+              </label>
+            </div>
+
+            {expirationEnabled ? (
+              <label className="mt-3 block">
+                <span className="text-sm font-medium text-slate-700">Lotes por linea</span>
+                <textarea
+                  name="expiration_dates_text"
+                  defaultValue={values.expiration_dates_text || ""}
+                  rows={4}
+                  placeholder={"2026-05-01 | 2 | paquete abierto\n2026-05-20 | 1 | nuevo"}
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900"
+                />
+                <p className="mt-1 text-xs text-slate-500">Formato: YYYY-MM-DD | cantidad | nota (cantidad y nota opcionales).</p>
+                <ErrorText text={state?.errors?.expiration_dates_text} />
+              </label>
+            ) : (
+              <input type="hidden" name="expiration_dates_text" value="" />
+            )}
+          </div>
+        ) : null}
 
         <div className="sm:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <p className="text-sm font-semibold text-slate-900">Asignacion NFC</p>

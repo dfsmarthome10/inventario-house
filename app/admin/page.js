@@ -259,6 +259,13 @@ function ItemAdminCard({ item }) {
           <p className="text-xs uppercase tracking-wide text-slate-500">
             {item.categoria_principal}{item.subcategoria ? ` / ${item.subcategoria}` : ""}
           </p>
+          {item.categoria_principal === "comida" ? (
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${item.expiration_enabled ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-700"}`}>
+                {item.expiration_enabled ? `Expira: ${Array.isArray(item.expiration_dates) ? item.expiration_dates.length : 0} lote(s)` : "Sin expiracion"}
+              </span>
+            </div>
+          ) : null}
           <div className="mt-1 flex flex-wrap gap-1.5">
             <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${PRIORITY_META[priority] || PRIORITY_META.normal}`}>
               {priority}

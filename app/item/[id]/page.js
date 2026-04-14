@@ -22,6 +22,39 @@ function QuantityRow({ actual, minima, unidad }) {
   );
 }
 
+function ExpirationSection({ item }) {
+  if (item.categoria_principal !== "comida") {
+    return null;
+  }
+
+  const enabled = Boolean(item.expiration_enabled);
+  const lots = Array.isArray(item.expiration_dates) ? item.expiration_dates : [];
+
+  return (
+    <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <h2 className="text-base font-semibold text-slate-900">Expiracion</h2>
+      {!enabled ? (
+        <p className="mt-2 text-sm text-slate-500">Seguimiento de expiracion desactivado para este alimento.</p>
+      ) : lots.length === 0 ? (
+        <p className="mt-2 text-sm text-slate-500">Expiracion activa, pero aun no hay lotes configurados.</p>
+      ) : (
+        <div className="mt-3 space-y-2">
+          {lots.map((lot, index) => (
+            <div key={`${lot.expires_on || "sin-fecha"}-${index}`} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p className="text-sm font-semibold text-slate-800">Vence: {lot.expires_on || "Sin fecha"}</p>
+              <p className="text-xs text-slate-600">
+                Cantidad: {lot.quantity === null || lot.quantity === undefined ? "N/A" : lot.quantity}
+                {item.unidad ? ` ${item.unidad}` : ""}
+              </p>
+              {lot.note ? <p className="mt-1 text-xs text-slate-500">Nota: {lot.note}</p> : null}
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default async function ItemDetailPage({ params }) {
   const item = await getItemById(params.id);
 
@@ -50,6 +83,8 @@ export default async function ItemDetailPage({ params }) {
           </div>
         </div>
       </section>
+
+      <ExpirationSection item={item} />
 
       <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="mb-3 text-base font-semibold text-slate-900">Metadatos</h2>
@@ -86,6 +121,12 @@ export default async function ItemDetailPage({ params }) {
             <dt className="font-medium text-slate-700">NFC mode</dt>
             <dd className="mt-1 text-slate-600">{item.nfc_mode || "none"}</dd>
           </div>
+          {item.categoria_principal === "comida" ? (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <dt className="font-medium text-slate-700">Expiracion activa</dt>
+              <dd className="mt-1 text-slate-600">{item.expiration_enabled ? "Si" : "No"}</dd>
+            </div>
+          ) : null}
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
             <dt className="font-medium text-slate-700">NFC tag UID</dt>
             <dd className="mt-1 break-all text-slate-600">{item.nfc_tag_uid || "No configurado"}</dd>
