@@ -6,8 +6,9 @@ import FoodFilterBar from "@/components/inventory/FoodFilterBar";
 import FoodZonePills from "@/components/inventory/FoodZonePills";
 import FoodAvailabilitySection from "@/components/inventory/FoodAvailabilitySection";
 import FoodHubQuickControls from "@/components/inventory/FoodHubQuickControls";
-import { FOOD_SUBCATEGORIES, applyInventoryFilters, getCategoryOptionsFromItems, getStockPriority, isLowStock } from "@/lib/inventoryFilters";
+import { FOOD_SUBCATEGORIES, HOUSE_SUBCATEGORIES, applyInventoryFilters, getCategoryOptionsFromItems, getStockPriority, isLowStock } from "@/lib/inventoryFilters";
 import { getAllItems } from "@/lib/inventoryRepository";
+import { getHouseSubcategoryLabel, HOUSE_ZONE_KEY_TO_SLUG } from "@/lib/house";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +16,84 @@ const TITLES = {
   cajas: "Hub de cajas",
   herramientas: "Hub de herramientas",
   comida: "Hub de comida",
+  casa: "Hub de casa",
   otros: "Hub de otros",
 };
+
+const HOUSE_META = {
+  aseo_casa: {
+    tone: "border-cyan-200 bg-cyan-50",
+    description: "Limpieza general y mantenimiento diario del hogar.",
+  },
+  aseo_personal: {
+    tone: "border-emerald-200 bg-emerald-50",
+    description: "Higiene personal y esenciales de bano.",
+  },
+  mejoras_casa: {
+    tone: "border-indigo-200 bg-indigo-50",
+    description: "Repuestos, consumibles y mejoras para la casa.",
+  },
+};
+
+function buildQuery(searchParams, extras = {}) {
+  const p = new URLSearchParams();
+  if (searchParams?.search) p.set("search", searchParams.search);
+  if (searchParams?.low_stock === "1") p.set("low_stock", "1");
+  if (searchParams?.available_only === "1") p.set("available_only", "1");
+  Object.entries(extras).forEach(([key, value]) => {
+    if (value) p.set(key, value);
+  });
+  const q = p.toString();
+  return q ? `?${q}` : "";
+}
+
+function CasaQuickControls({ searchParams }) {
+  const activeZone = searchParams?.subcategoria || "";
+  const availableOnly = searchParams?.available_only === "1";
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Vista</span>
+      <Link
+        href={`/inventory/casa${buildQuery(searchParams, { subcategoria: null, available_only: null })}`}
+        className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+          !availableOnly ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+        }`}
+      >
+        Ver todo
+      </Link>
+      <Link
+        href={`/inventory/casa${buildQuery(searchParams, { subcategoria: activeZone || null, available_only: "1" })}`}
+        className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+          availableOnly ? "border-emerald-700 bg-emerald-700 text-white" : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+        }`}
+      >
+        Ver solo disponibles
+      </Link>
+
+      <span className="ml-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Subcategoria</span>
+      <Link
+        href={`/inventory/casa${buildQuery(searchParams, { subcategoria: null })}`}
+        className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+          !activeZone ? "border-cyan-700 bg-cyan-700 text-white" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+        }`}
+      >
+        Todas
+      </Link>
+      {HOUSE_SUBCATEGORIES.map((sub) => (
+        <Link
+          key={sub}
+          href={`/inventory/casa${buildQuery(searchParams, { subcategoria: sub })}`}
+          className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+            activeZone === sub ? "border-cyan-700 bg-cyan-700 text-white" : "border-cyan-200 bg-cyan-50 text-cyan-700 hover:bg-cyan-100"
+          }`}
+        >
+          {getHouseSubcategoryLabel(sub)}
+        </Link>
+      ))}
+    </div>
+  );
+}
 
 export default async function InventoryCategoryPage({ params, searchParams }) {
   const categoria = params.categoria;
@@ -34,13 +111,20 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
     categoria_principal: categoria,
   };
   const filtered = applyInventoryFilters(items, filters);
+
   const foodFilteredBase = filtered.filter((item) => item.categoria_principal === "comida");
   const foodAll = items.filter((item) => item.categoria_principal === "comida");
   const foodFiltered = availableOnly
     ? foodFilteredBase.filter((item) => typeof item.cantidad_actual === "number" && item.cantidad_actual >= 1)
     : foodFilteredBase;
-  const zonesToRender = FOOD_SUBCATEGORIES.includes(zoneFilter) ? [zoneFilter] : FOOD_SUBCATEGORIES;
+  const foodZonesToRender = FOOD_SUBCATEGORIES.includes(zoneFilter) ? [zoneFilter] : FOOD_SUBCATEGORIES;
 
+  const houseFilteredBase = filtered.filter((item) => item.categoria_principal === "casa");
+  const houseAll = items.filter((item) => item.categoria_principal === "casa");
+  const houseFiltered = availableOnly
+    ? houseFilteredBase.filter((item) => typeof item.cantidad_actual === "number" && item.cantidad_actual >= 1)
+    : houseFilteredBase;
+  const houseZonesToRender = HOUSE_SUBCATEGORIES.includes(zoneFilter) ? [zoneFilter] : HOUSE_SUBCATEGORIES;
 
   return (
     <main className="space-y-4">
@@ -49,7 +133,9 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
         <p className="mt-1 text-sm text-slate-600">
           {categoria === "comida"
             ? "Gestiona lacena, nevera y congelador con filtros rapidos."
-            : "Vista enfocada por categoria principal."}
+            : categoria === "casa"
+              ? "Gestiona aseo casa, aseo personal y mejoras con flujo de reposicion premium."
+              : "Vista enfocada por categoria principal."}
         </p>
       </section>
 
@@ -108,7 +194,7 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
 
             <FoodFilterBar searchParams={searchParams || {}} clearHref={availableOnly ? "/inventory/comida?available_only=1" : "/inventory/comida"} />
 
-            {zonesToRender.map((zone) => {
+            {foodZonesToRender.map((zone) => {
               const zoneItems = foodFiltered.filter((item) => item.subcategoria === zone);
               const preview = zoneItems.slice(0, 4);
               const lowStock = zoneItems.filter((item) => isLowStock(item)).length;
@@ -125,14 +211,7 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
                     </div>
                     <div className="flex gap-2">
                       <Link
-                        href={`/inventory/comida/${zone}${(() => {
-                          const p = new URLSearchParams();
-                          if (searchParams?.search) p.set("search", searchParams.search);
-                          if (searchParams?.low_stock === "1") p.set("low_stock", "1");
-                          if (availableOnly) p.set("available_only", "1");
-                          const q = p.toString();
-                          return q ? `?${q}` : "";
-                        })()}`}
+                        href={`/inventory/comida/${zone}${buildQuery(searchParams)}`}
                         className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
                       >
                         Abrir zona
@@ -155,18 +234,90 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
                 </div>
               );
             })}
-
-            {foodFiltered.some((item) => !item.subcategoria) ? (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-700">Sin zona</h2>
-                <div className="grid gap-3">
-                  {foodFiltered.filter((item) => !item.subcategoria).map((item) => <InventoryItemCard key={item.id} item={item} />)}
-                </div>
-              </div>
-            ) : null}
           </div>
         </section>
-      ) : (
+      ) : null}
+
+      {categoria === "casa" ? (
+        <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="space-y-4">
+            <div className="rounded-3xl border border-cyan-200 bg-cyan-50 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">Casa hub</p>
+                  <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-900">Navegacion rapida por subcategorias</h2>
+                  <p className="mt-1 text-sm text-slate-600">Aseo, cuidado personal y mejoras del hogar en una sola vista premium.</p>
+                </div>
+                <div className="grid min-w-[150px] grid-cols-2 gap-2 text-xs">
+                  <div className="rounded-xl border border-white/80 bg-white px-3 py-2">
+                    <p className="font-semibold text-slate-900">{houseAll.length}</p>
+                    <p className="text-slate-500">Total casa</p>
+                  </div>
+                  <div className="rounded-xl border border-white/80 bg-white px-3 py-2">
+                    <p className="font-semibold text-rose-700">{houseAll.filter((item) => isLowStock(item)).length}</p>
+                    <p className="text-slate-500">Stock bajo</p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-3">
+                <Link href="/shopping/casa" className="inline-flex rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">
+                  Entrar a modo compra casa
+                </Link>
+              </div>
+              <div className="mt-4">
+                <CasaQuickControls searchParams={searchParams || {}} />
+              </div>
+            </div>
+
+            <FoodFilterBar searchParams={searchParams || {}} clearHref={availableOnly ? "/inventory/casa?available_only=1" : "/inventory/casa"} />
+
+            {houseZonesToRender.map((sub) => {
+              const zoneItems = houseFiltered.filter((item) => item.subcategoria === sub);
+              const preview = zoneItems.slice(0, 6);
+              const lowStock = zoneItems.filter((item) => isLowStock(item)).length;
+              const critical = zoneItems.filter((item) => getStockPriority(item) === "critical").length;
+              const slug = HOUSE_ZONE_KEY_TO_SLUG[sub];
+
+              return (
+                <div key={sub} className={`rounded-3xl border p-4 ${HOUSE_META[sub]?.tone || "border-slate-200 bg-slate-50"}`}>
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-700">{getHouseSubcategoryLabel(sub)}</h2>
+                      <span className="rounded-full bg-white px-2.5 py-1 text-xs font-medium text-slate-700">{zoneItems.length}</span>
+                      <span className="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-700">{lowStock} bajos</span>
+                      {critical > 0 ? <span className="rounded-full bg-rose-600 px-2.5 py-1 text-xs font-medium text-white">{critical} criticos</span> : null}
+                    </div>
+                    <div className="flex gap-2">
+                      <Link
+                        href={`/inventory/casa/${slug}${buildQuery(searchParams)}`}
+                        className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+                      >
+                        Abrir seccion
+                      </Link>
+                      <Link
+                        href={`/shopping/casa?subcategoria=${encodeURIComponent(sub)}&low_stock=1`}
+                        className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+                      >
+                        Reponer
+                      </Link>
+                    </div>
+                  </div>
+                  <p className="mb-3 text-xs text-slate-600">{HOUSE_META[sub]?.description}</p>
+                  {zoneItems.length === 0 ? (
+                    <p className="text-sm text-slate-500">Sin items en esta subcategoria.</p>
+                  ) : (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {preview.map((item) => <InventoryItemCard key={item.id} item={item} variant="showroom" />)}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+
+      {categoria !== "comida" && categoria !== "casa" ? (
         <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           {filtered.length === 0 ? (
             <p className="text-sm text-slate-500">No hay items para esta categoria con los filtros actuales.</p>
@@ -174,7 +325,7 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
             <div className="grid gap-3">{filtered.map((item) => <InventoryItemCard key={item.id} item={item} />)}</div>
           )}
         </section>
-      )}
+      ) : null}
     </main>
   );
 }

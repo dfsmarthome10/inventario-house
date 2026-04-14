@@ -65,10 +65,10 @@ export default function InventoryItemCard({ item, variant = "default" }) {
           <span className="rounded-full bg-emerald-100 px-2 py-1 font-medium text-emerald-700">{item.subcategoria}</span>
         ) : null}
       </div>
-      {lowStock && item.categoria_principal === "comida" ? (
+      {lowStock && (item.categoria_principal === "comida" || item.categoria_principal === "casa") ? (
         <div className="mt-2">
           <span className="inline-flex rounded-xl border border-slate-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700">
-            Reponer: /shopping/comida
+            {`Reponer: /shopping/${item.categoria_principal}`}
           </span>
         </div>
       ) : null}

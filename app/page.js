@@ -8,6 +8,7 @@ const CATEGORY_META = {
   cajas: { title: "Cajas", href: "/inventory/cajas", tone: "bg-amber-100 text-amber-700" },
   herramientas: { title: "Herramientas", href: "/inventory/herramientas", tone: "bg-slate-200 text-slate-700" },
   comida: { title: "Comida", href: "/inventory/comida", tone: "bg-emerald-100 text-emerald-700" },
+  casa: { title: "Casa", href: "/inventory/casa", tone: "bg-cyan-100 text-cyan-700" },
   otros: { title: "Otros", href: "/inventory?categoria_principal=otros", tone: "bg-indigo-100 text-indigo-700" },
 };
 
@@ -48,6 +49,10 @@ export default async function HomePage() {
           <div className="col-span-2 rounded-2xl bg-sky-50 p-3 sm:col-span-1">
             <p className="text-[11px] uppercase tracking-wide text-sky-600">Herramientas</p>
             <p className="mt-1 text-2xl font-semibold text-sky-800">{summary.byMainCategory.herramientas || 0}</p>
+          </div>
+          <div className="col-span-2 rounded-2xl bg-cyan-50 p-3 sm:col-span-1 lg:col-span-1">
+            <p className="text-[11px] uppercase tracking-wide text-cyan-600">Casa</p>
+            <p className="mt-1 text-2xl font-semibold text-cyan-800">{summary.byMainCategory.casa || 0}</p>
           </div>
         </div>
       </section>
@@ -111,6 +116,10 @@ export default async function HomePage() {
               {key === "comida" ? (
                 <p className="mt-1 text-[11px] text-slate-500">
                   lacena {summary.foodByZone.lacena} | nevera {summary.foodByZone.nevera} | congelador {summary.foodByZone.congelador}
+                </p>
+              ) : key === "casa" ? (
+                <p className="mt-1 text-[11px] text-slate-500">
+                  aseo casa {summary.houseByZone.aseo_casa} | aseo personal {summary.houseByZone.aseo_personal} | mejoras {summary.houseByZone.mejoras_casa}
                 </p>
               ) : (
                 <p className="mt-1 text-[11px] text-slate-500">Abrir hub</p>
@@ -179,6 +188,40 @@ export default async function HomePage() {
               Ir a compras
             </Link>
           </div>
+        </div>
+      </section>
+
+      <section className="grid gap-3 lg:grid-cols-3">
+        <div className="ios-widget-strong lg:col-span-2">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-base font-semibold text-slate-900">Casa (vista rapida)</h2>
+            <Link href="/inventory/casa" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium hover:bg-slate-50">
+              Abrir hub
+            </Link>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-3">
+            <Link href="/inventory/casa/aseo-casa" className="rounded-xl border border-cyan-200 bg-cyan-50 p-3">
+              <p className="text-xs font-semibold text-cyan-700">Aseo Casa</p>
+              <p className="mt-1 text-[11px] text-slate-600">{summary.houseByZone.aseo_casa} items</p>
+            </Link>
+            <Link href="/inventory/casa/aseo-personal" className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+              <p className="text-xs font-semibold text-emerald-700">Aseo Personal</p>
+              <p className="mt-1 text-[11px] text-slate-600">{summary.houseByZone.aseo_personal} items</p>
+            </Link>
+            <Link href="/inventory/casa/mejoras-casa" className="rounded-xl border border-indigo-200 bg-indigo-50 p-3">
+              <p className="text-xs font-semibold text-indigo-700">Mejoras Casa</p>
+              <p className="mt-1 text-[11px] text-slate-600">{summary.houseByZone.mejoras_casa} items</p>
+            </Link>
+          </div>
+        </div>
+        <div className="ios-widget-strong">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-base font-semibold text-slate-900">Reposicion casa</h2>
+            <Link href="/shopping/casa?low_stock=1" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium hover:bg-slate-50">
+              Ir a compras
+            </Link>
+          </div>
+          <p className="text-sm text-slate-600">Compra por subcategoria sin GPT: aseo casa, personal y mejoras.</p>
         </div>
       </section>
 

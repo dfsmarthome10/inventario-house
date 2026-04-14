@@ -9,6 +9,14 @@ const ZONE_LABELS = {
   lacena: "Lacena",
   nevera: "Nevera",
   congelador: "Congelador",
+  aseo_casa: "Aseo Casa",
+  aseo_personal: "Aseo Personal",
+  mejoras_casa: "Mejoras Casa",
+};
+
+const SCOPE_LABELS = {
+  comida: "Comida",
+  casa: "Casa",
 };
 
 export default async function ShoppingReceiptPage({ params }) {
@@ -27,7 +35,7 @@ export default async function ShoppingReceiptPage({ params }) {
             {error instanceof Error ? error.message : "Unknown error"}
           </pre>
           <div className="mt-4">
-            <Link href="/shopping/comida" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            <Link href="/shopping" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Volver a compras
             </Link>
           </div>
@@ -48,6 +56,7 @@ export default async function ShoppingReceiptPage({ params }) {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Recibo de compra</p>
             <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">{receipt.id}</h1>
             <p className="mt-1 text-sm text-slate-600">Registro confirmado. Inventario actualizado al cerrar la compra.</p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Scope: {SCOPE_LABELS[receipt.scope] || "General"}</p>
           </div>
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
             <p className="text-xs uppercase tracking-wide text-emerald-700">Total final</p>
@@ -124,14 +133,14 @@ export default async function ShoppingReceiptPage({ params }) {
       </section>
 
       <section className="flex flex-wrap gap-2">
-        <Link href="/shopping/comida" className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">
+        <Link href={receipt.scope === "casa" ? "/shopping/casa" : "/shopping/comida"} className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">
           Nueva compra
         </Link>
         <Link href="/shopping/history" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
           Ver historial
         </Link>
-        <Link href="/inventory/comida" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
-          Volver al food hub
+        <Link href={receipt.scope === "casa" ? "/inventory/casa" : "/inventory/comida"} className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          Volver al hub
         </Link>
       </section>
     </main>

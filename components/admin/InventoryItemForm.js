@@ -7,6 +7,7 @@ const MAIN_CATEGORY_OPTIONS = [
   { value: "cajas", label: "Cajas" },
   { value: "herramientas", label: "Herramientas" },
   { value: "comida", label: "Comida" },
+  { value: "casa", label: "Casa" },
   { value: "otros", label: "Otros" },
 ];
 
@@ -14,6 +15,9 @@ const FOOD_SUBCATEGORY_OPTIONS = [
   { value: "lacena", label: "Lacena" },
   { value: "nevera", label: "Nevera" },
   { value: "congelador", label: "Congelador" },
+  { value: "aseo_casa", label: "Aseo Casa" },
+  { value: "aseo_personal", label: "Aseo Personal" },
+  { value: "mejoras_casa", label: "Mejoras Casa" },
 ];
 
 function SubmitButton({ label }) {
@@ -147,7 +151,7 @@ export default function InventoryItemForm({
         </label>
 
         <label className="block">
-          <span className="text-sm font-medium text-slate-700">Subcategoria (comida)</span>
+          <span className="text-sm font-medium text-slate-700">Subcategoria (comida/casa)</span>
           <input
             name="subcategoria"
             list="food-subcategory-options"
@@ -160,7 +164,7 @@ export default function InventoryItemForm({
               <option key={value} value={value} />
             ))}
           </datalist>
-          <p className="mt-1 text-xs text-slate-500">Para comida usa por defecto: lacena, nevera o congelador.</p>
+          <p className="mt-1 text-xs text-slate-500">Comida: lacena/nevera/congelador. Casa: aseo_casa/aseo_personal/mejoras_casa.</p>
           <ErrorText text={state?.errors?.subcategoria} />
         </label>
 

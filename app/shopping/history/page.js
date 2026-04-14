@@ -8,6 +8,14 @@ const ZONE_LABELS = {
   lacena: "Lacena",
   nevera: "Nevera",
   congelador: "Congelador",
+  aseo_casa: "Aseo Casa",
+  aseo_personal: "Aseo Personal",
+  mejoras_casa: "Mejoras Casa",
+};
+
+const SCOPE_LABELS = {
+  comida: "Comida",
+  casa: "Casa",
 };
 
 export default async function ShoppingHistoryPage({ searchParams }) {
@@ -51,6 +59,9 @@ export default async function ShoppingHistoryPage({ searchParams }) {
             <Link href="/shopping/comida" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Nueva compra
             </Link>
+            <Link href="/shopping/casa" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+              Compra casa
+            </Link>
             <Link href="/shopping/recommend" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Recomendar
             </Link>
@@ -62,7 +73,7 @@ export default async function ShoppingHistoryPage({ searchParams }) {
       </section>
 
       <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
-        <form method="get" className="grid gap-3 sm:grid-cols-[1fr_200px_auto] sm:items-end">
+        <form method="get" className="grid gap-3 sm:grid-cols-[1fr_170px_170px_auto] sm:items-end">
           <label className="flex flex-col gap-1">
             <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Buscar</span>
             <input
@@ -71,6 +82,17 @@ export default async function ShoppingHistoryPage({ searchParams }) {
               placeholder="ID de recibo o nombre de item"
               className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900"
             />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Scope</span>
+            <select name="scope" defaultValue={searchParams?.scope || ""} className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900">
+              <option value="">Todos</option>
+              {Object.entries(SCOPE_LABELS).map(([key, label]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
+            </select>
           </label>
           <label className="flex flex-col gap-1">
             <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Zona</span>
@@ -124,6 +146,7 @@ export default async function ShoppingHistoryPage({ searchParams }) {
                   <div className="text-right">
                     <p className="text-xs uppercase tracking-wide text-slate-500">Total final</p>
                     <p className="text-lg font-semibold tracking-tight text-slate-900">{formatCurrency(receipt.grand_total || receipt.total_amount)}</p>
+                    <p className="text-[11px] text-slate-500">{SCOPE_LABELS[receipt.scope] || "General"}</p>
                   </div>
                 </div>
 

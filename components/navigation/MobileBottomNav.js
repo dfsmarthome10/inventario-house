@@ -85,7 +85,7 @@ export default function MobileBottomNav() {
   return (
     <div className="ios-bottom-nav md:hidden">
       <div className="ios-bottom-shell">
-        <Link href="/shopping/comida" className={`ios-bottom-tab ${shoppingActive ? "ios-bottom-tab-active" : ""}`}>
+        <Link href="/shopping" className={`ios-bottom-tab ${shoppingActive ? "ios-bottom-tab-active" : ""}`}>
           <TabIcon type="shopping" active={shoppingActive} />
           <span>Compra</span>
         </Link>

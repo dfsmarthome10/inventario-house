@@ -4,6 +4,7 @@ const CATEGORY_LABELS = {
   cajas: "Cajas",
   herramientas: "Herramientas",
   comida: "Comida",
+  casa: "Casa",
   otros: "Otros",
 };
 
@@ -11,6 +12,9 @@ const SUBCATEGORY_LABELS = {
   lacena: "Lacena",
   nevera: "Nevera",
   congelador: "Congelador",
+  aseo_casa: "Aseo Casa",
+  aseo_personal: "Aseo Personal",
+  mejoras_casa: "Mejoras Casa",
 };
 
 export default function InventoryFilterBar({

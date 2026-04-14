@@ -26,9 +26,14 @@ function revalidateInventoryPaths(itemId) {
   revalidatePath("/inventory/comida/nevera");
   revalidatePath("/inventory/comida/congelador");
   revalidatePath("/inventory/comida/disponibles");
+  revalidatePath("/inventory/casa");
+  revalidatePath("/inventory/casa/aseo-casa");
+  revalidatePath("/inventory/casa/aseo-personal");
+  revalidatePath("/inventory/casa/mejoras-casa");
   revalidatePath("/inventory/cajas");
   revalidatePath("/inventory/herramientas");
   revalidatePath("/shopping/comida");
+  revalidatePath("/shopping/casa");
   revalidatePath("/shopping/recommend");
   revalidatePath(`/item/${itemId}`);
 }

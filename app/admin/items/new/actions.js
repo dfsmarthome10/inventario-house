@@ -49,9 +49,14 @@ export async function createItemAction(previousState, formData) {
   revalidatePath("/inventory/comida/lacena");
   revalidatePath("/inventory/comida/nevera");
   revalidatePath("/inventory/comida/congelador");
+  revalidatePath("/inventory/casa");
+  revalidatePath("/inventory/casa/aseo-casa");
+  revalidatePath("/inventory/casa/aseo-personal");
+  revalidatePath("/inventory/casa/mejoras-casa");
   revalidatePath("/inventory/cajas");
   revalidatePath("/inventory/herramientas");
   revalidatePath("/admin");
+  revalidatePath("/shopping/casa");
   revalidatePath("/admin/nfc");
   revalidatePath("/admin/nfc/items");
   revalidatePath("/admin/nfc/zones");

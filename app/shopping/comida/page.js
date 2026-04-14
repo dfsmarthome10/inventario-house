@@ -120,8 +120,11 @@ export default async function ShoppingFoodPage({ searchParams }) {
             <Link href="/inventory/comida" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Volver al food hub
             </Link>
-            <Link href="/shopping/history" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            <Link href="/shopping/history?scope=comida" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Historial
+            </Link>
+            <Link href="/shopping/casa" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+              Compra casa
             </Link>
             <Link href="/shopping/recommend" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Recomendar

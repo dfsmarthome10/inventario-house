@@ -12,6 +12,7 @@ const MAIN_CATEGORY_META = {
   cajas: { title: "Cajas", accent: "bg-amber-100 text-amber-700" },
   herramientas: { title: "Herramientas", accent: "bg-slate-200 text-slate-700" },
   comida: { title: "Comida", accent: "bg-emerald-100 text-emerald-700" },
+  casa: { title: "Casa", accent: "bg-cyan-100 text-cyan-700" },
   otros: { title: "Otros", accent: "bg-indigo-100 text-indigo-700" },
 };
 
@@ -19,6 +20,12 @@ const FOOD_SUBCATEGORY_META = {
   lacena: "Lacena",
   nevera: "Nevera",
   congelador: "Congelador",
+};
+
+const HOUSE_SUBCATEGORY_META = {
+  aseo_casa: "Aseo Casa",
+  aseo_personal: "Aseo Personal",
+  mejoras_casa: "Mejoras Casa",
 };
 
 const PRIORITY_META = {
@@ -119,8 +126,8 @@ function ItemAdminCard({ item }) {
             <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${PRIORITY_META[priority] || PRIORITY_META.normal}`}>
               {priority}
             </span>
-            {isLowStock(item) && item.categoria_principal === "comida" ? (
-              <Link href={`/shopping/comida?search=${encodeURIComponent(item.nombre)}&low_stock=1`} className="rounded-full border border-slate-300 bg-white px-2 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50">
+            {isLowStock(item) && (item.categoria_principal === "comida" || item.categoria_principal === "casa") ? (
+              <Link href={`/shopping/${item.categoria_principal}?search=${encodeURIComponent(item.nombre)}&low_stock=1`} className="rounded-full border border-slate-300 bg-white px-2 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50">
                 Reponer
               </Link>
             ) : null}
@@ -195,7 +202,8 @@ export default async function AdminPage({ searchParams }) {
           <div className="flex flex-wrap gap-2">
             <Link href="/admin/items/new" className="rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">Crear item</Link>
             <Link href="/admin/nfc" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium hover:bg-slate-50">Gestion NFC</Link>
-            <Link href="/shopping/comida" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium hover:bg-slate-50">Modo compra</Link>
+            <Link href="/shopping/comida" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium hover:bg-slate-50">Compra comida</Link>
+            <Link href="/shopping/casa" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium hover:bg-slate-50">Compra casa</Link>
             <Link href="/inventory" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium hover:bg-slate-50">Ver inventario</Link>
           </div>
         </div>
@@ -222,9 +230,9 @@ export default async function AdminPage({ searchParams }) {
                   <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${meta.accent}`}>categoria principal</span>
                 </div>
 
-                {mainCategory === "comida" ? (
+                {mainCategory === "comida" || mainCategory === "casa" ? (
                   <div className="space-y-4">
-                    {Object.entries(FOOD_SUBCATEGORY_META).map(([subKey, subLabel]) => {
+                    {Object.entries(mainCategory === "comida" ? FOOD_SUBCATEGORY_META : HOUSE_SUBCATEGORY_META).map(([subKey, subLabel]) => {
                       const subItems = block?.subcategorias?.[subKey] || [];
 
                       return (
@@ -241,7 +249,9 @@ export default async function AdminPage({ searchParams }) {
 
                     {(block?.items?.length || 0) > 0 ? (
                       <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                        <h4 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600">Comida sin zona</h4>
+                        <h4 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600">
+                          {mainCategory === "comida" ? "Comida sin zona" : "Casa sin subcategoria"}
+                        </h4>
                         <div className="grid gap-3">{block.items.map((item) => <ItemAdminCard key={item.id} item={item} />)}</div>
                       </div>
                     ) : null}

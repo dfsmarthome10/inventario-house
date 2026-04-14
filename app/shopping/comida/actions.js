@@ -79,6 +79,7 @@ function locationFromZone(zone) {
 function revalidateShoppingPaths() {
   revalidatePath("/shopping");
   revalidatePath("/shopping/comida");
+  revalidatePath("/shopping/casa");
   revalidatePath("/shopping/history");
   revalidatePath("/shopping/history/calendar");
 }
@@ -93,6 +94,10 @@ function revalidateInventoryViews(itemIds = []) {
   revalidatePath("/inventory/comida/congelador");
   revalidatePath("/inventory/cajas");
   revalidatePath("/inventory/herramientas");
+  revalidatePath("/inventory/casa");
+  revalidatePath("/inventory/casa/aseo-casa");
+  revalidatePath("/inventory/casa/aseo-personal");
+  revalidatePath("/inventory/casa/mejoras-casa");
   revalidatePath("/admin/nfc");
   revalidatePath("/admin/nfc/items");
   revalidatePath("/admin/nfc/zones");

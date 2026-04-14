@@ -4,6 +4,20 @@ import { getPurchaseHistoryCalendar } from "@/lib/shoppingRepository";
 
 export const dynamic = "force-dynamic";
 
+const ZONE_LABELS = {
+  lacena: "Lacena",
+  nevera: "Nevera",
+  congelador: "Congelador",
+  aseo_casa: "Aseo Casa",
+  aseo_personal: "Aseo Personal",
+  mejoras_casa: "Mejoras Casa",
+};
+
+const SCOPE_LABELS = {
+  comida: "Comida",
+  casa: "Casa",
+};
+
 function parseMonth(value) {
   const valid = /^\d{4}-\d{2}$/.test(value || "");
   if (!valid) {
@@ -49,12 +63,13 @@ function monthLabel(month) {
 
 export default async function ShoppingHistoryCalendarPage({ searchParams }) {
   const month = parseMonth(typeof searchParams?.month === "string" ? searchParams.month : "");
+  const scope = typeof searchParams?.scope === "string" ? searchParams.scope : "";
   const selectedDate = typeof searchParams?.date === "string" ? searchParams.date : "";
   let calendarData = { receipts: [], days: [] };
   let setupError = "";
 
   try {
-    calendarData = await getPurchaseHistoryCalendar(month);
+    calendarData = await getPurchaseHistoryCalendar(month, { scope });
   } catch (error) {
     setupError = error instanceof Error ? error.message : "Calendar history is not ready.";
   }
@@ -76,6 +91,7 @@ export default async function ShoppingHistoryCalendarPage({ searchParams }) {
       </main>
     );
   }
+
   const calendarCells = buildCalendarCells(month);
   const receiptsByDate = new Map();
   (calendarData.receipts || []).forEach((receipt) => {
@@ -102,26 +118,43 @@ export default async function ShoppingHistoryCalendarPage({ searchParams }) {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Historial calendario</p>
             <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">Compras por fecha</h1>
-            <p className="mt-1 text-sm text-slate-600">Selecciona un día para ver recibos de compra.</p>
+            <p className="mt-1 text-sm text-slate-600">Selecciona un dia para ver recibos de compra.</p>
           </div>
           <div className="flex gap-2">
             <Link href="/shopping/history" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Volver a lista
             </Link>
             <Link href="/shopping/comida" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
-              Nueva compra
+              Compra comida
+            </Link>
+            <Link href="/shopping/casa" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+              Compra casa
             </Link>
           </div>
         </div>
       </section>
 
+      <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Scope</span>
+          <Link href={`/shopping/history/calendar?month=${month}`} className={`rounded-full border px-3 py-1.5 text-xs font-medium ${!scope ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 bg-white text-slate-700"}`}>
+            Todos
+          </Link>
+          {Object.entries(SCOPE_LABELS).map(([key, label]) => (
+            <Link key={key} href={`/shopping/history/calendar?month=${month}&scope=${key}`} className={`rounded-full border px-3 py-1.5 text-xs font-medium ${scope === key ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 bg-white text-slate-700"}`}>
+              {label}
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
-          <Link href={`/shopping/history/calendar?month=${prevMonth}`} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          <Link href={`/shopping/history/calendar?month=${prevMonth}${scope ? `&scope=${scope}` : ""}`} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
             Mes anterior
           </Link>
           <h2 className="text-lg font-semibold capitalize text-slate-900">{monthLabel(month)}</h2>
-          <Link href={`/shopping/history/calendar?month=${nextMonth}`} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          <Link href={`/shopping/history/calendar?month=${nextMonth}${scope ? `&scope=${scope}` : ""}`} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
             Mes siguiente
           </Link>
         </div>
@@ -146,7 +179,7 @@ export default async function ShoppingHistoryCalendarPage({ searchParams }) {
             return (
               <Link
                 key={dateKey}
-                href={`/shopping/history/calendar?month=${month}&date=${dateKey}`}
+                href={`/shopping/history/calendar?month=${month}&date=${dateKey}${scope ? `&scope=${scope}` : ""}`}
                 className={`h-14 rounded-xl border px-2 py-1 text-left transition ${
                   active
                     ? "border-slate-900 bg-slate-900 text-white"
@@ -175,7 +208,7 @@ export default async function ShoppingHistoryCalendarPage({ searchParams }) {
         </div>
 
         {!selectedDate ? (
-          <p className="text-sm text-slate-500">Toca un día del calendario para ver los recibos.</p>
+          <p className="text-sm text-slate-500">Toca un dia del calendario para ver los recibos.</p>
         ) : receiptsForDay.length === 0 ? (
           <p className="text-sm text-slate-500">No hay compras en esta fecha.</p>
         ) : (
@@ -200,7 +233,7 @@ export default async function ShoppingHistoryCalendarPage({ searchParams }) {
                 <div className="mt-3 flex flex-wrap gap-2">
                   {Object.entries(selectedDaySummary.zone_summary || {}).map(([zoneKey, zone]) => (
                     <span key={zoneKey} className="rounded-full border border-white bg-white px-2.5 py-1 text-xs font-medium text-slate-700">
-                      {zoneKey}: {zone.units} u · {formatCurrency(zone.amount)}
+                      {ZONE_LABELS[zoneKey] || zoneKey}: {zone.units} u - {formatCurrency(zone.amount)}
                     </span>
                   ))}
                 </div>
@@ -208,31 +241,31 @@ export default async function ShoppingHistoryCalendarPage({ searchParams }) {
             ) : null}
 
             <div className="space-y-3">
-            {receiptsForDay.map((receipt) => (
-              <Link
-                key={receipt.id}
-                href={`/shopping/receipt/${encodeURIComponent(receipt.id)}`}
-                className="block rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-px hover:border-slate-300 hover:bg-white"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">{receipt.id}</p>
-                    <p className="text-xs text-slate-500">{formatDateTime(receipt.created_at)}</p>
+              {receiptsForDay.map((receipt) => (
+                <Link
+                  key={receipt.id}
+                  href={`/shopping/receipt/${encodeURIComponent(receipt.id)}`}
+                  className="block rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-px hover:border-slate-300 hover:bg-white"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">{receipt.id}</p>
+                      <p className="text-xs text-slate-500">{formatDateTime(receipt.created_at)}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs uppercase tracking-wide text-slate-500">Total</p>
+                      <p className="text-lg font-semibold tracking-tight text-slate-900">{formatCurrency(receipt.grand_total || receipt.total_amount)}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Total</p>
-                    <p className="text-lg font-semibold tracking-tight text-slate-900">{formatCurrency(receipt.grand_total || receipt.total_amount)}</p>
+                  <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                    {Object.entries(receipt.zone_summary || {}).map(([zoneKey, zone]) => (
+                      <span key={zoneKey} className="rounded-full border border-white bg-white px-2.5 py-1 font-medium text-slate-700">
+                        {ZONE_LABELS[zoneKey] || zoneKey}: {zone.units} u
+                      </span>
+                    ))}
                   </div>
-                </div>
-                <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                  {Object.entries(receipt.zone_summary || {}).map(([zoneKey, zone]) => (
-                    <span key={zoneKey} className="rounded-full border border-white bg-white px-2.5 py-1 font-medium text-slate-700">
-                      {zoneKey}: {zone.units} u
-                    </span>
-                  ))}
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
             </div>
           </div>
         )}
