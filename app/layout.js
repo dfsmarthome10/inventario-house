@@ -2,13 +2,26 @@ import "./globals.css";
 import Link from "next/link";
 import MobileBottomNav from "@/components/navigation/MobileBottomNav";
 import MobileTopMenu from "@/components/navigation/MobileTopMenu";
+import { getOpenCartBadgeCounts } from "@/lib/shoppingRepository";
 
 export const metadata = {
   title: "Inventory House NFC",
   description: "Sistema de inventario del hogar basado en NFC",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  let cartBadgeCounts = {
+    comida_lines: 0,
+    casa_lines: 0,
+    total_lines: 0,
+  };
+
+  try {
+    cartBadgeCounts = await getOpenCartBadgeCounts();
+  } catch (error) {
+    cartBadgeCounts = { comida_lines: 0, casa_lines: 0, total_lines: 0 };
+  }
+
   return (
     <html lang="es">
       <body>
@@ -43,7 +56,7 @@ export default function RootLayout({ children }) {
           </header>
           {children}
         </div>
-        <MobileBottomNav />
+        <MobileBottomNav cartBadgeCounts={cartBadgeCounts} />
       </body>
     </html>
   );

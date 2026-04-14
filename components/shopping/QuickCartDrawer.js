@@ -126,14 +126,6 @@ export default function QuickCartDrawer({
         <span className="ml-2 rounded-full bg-white/20 px-2 py-0.5 text-xs">{summary.lineCount}</span>
       </button>
 
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="fixed bottom-20 right-4 z-40 rounded-full bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-xl md:hidden"
-      >
-        Carrito · {summary.lineCount}
-      </button>
-
       <div
         className={`fixed inset-0 z-50 transition ${open ? "pointer-events-auto" : "pointer-events-none"}`}
         aria-hidden={!open}
@@ -155,7 +147,7 @@ export default function QuickCartDrawer({
           <div className="mb-3 flex items-start justify-between gap-2 border-b border-slate-200 pb-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Quick cart</p>
-              <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-900">Carrito rapido · {scopeLabel}</h2>
+              <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-900">Carrito rapido - {scopeLabel}</h2>
             </div>
             <div className="flex items-center gap-2">
               <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${scopeTone}`}>{summary.lineCount} lineas</span>

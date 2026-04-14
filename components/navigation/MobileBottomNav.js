@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 function isActive(pathname, href) {
-  if (href === "/") {
-    return pathname === "/";
-  }
+  if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -33,14 +32,6 @@ function TabIcon({ type, active = false }) {
     );
   }
 
-  if (type === "back") {
-    return (
-      <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 5l-7 7 7 7" />
-      </svg>
-    );
-  }
-
   if (type === "inventory") {
     return (
       <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -51,64 +42,150 @@ function TabIcon({ type, active = false }) {
     );
   }
 
-  if (type === "admin") {
+  if (type === "cart") {
     return (
       <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M12 3l2.5 2.7 3.6-.6.6 3.6L21.5 12l-2.8 3.3-.6 3.6-3.6-.6L12 21l-2.5-2.7-3.6.6-.6-3.6L2.5 12l2.8-3.3.6-3.6 3.6.6L12 3z" />
-        <circle cx="12" cy="12" r="2.6" />
+        <circle cx="9" cy="19" r="1.4" />
+        <circle cx="17" cy="19" r="1.4" />
+        <path d="M3.5 5h2l1.3 9.2a1.6 1.6 0 0 0 1.6 1.4h8.8a1.6 1.6 0 0 0 1.6-1.3L20 8.5H7.1" />
       </svg>
     );
   }
 
-  return type === "home" ? (
+  return (
     <svg viewBox="0 0 24 24" className="h-5 w-5 text-current" fill="none" stroke="currentColor" strokeWidth="2">
       <path strokeLinecap="round" strokeLinejoin="round" d="M3.5 10.5L12 4l8.5 6.5" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M6.5 9.8V20h11V9.8" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M10 20v-4.8h4V20" />
     </svg>
-  ) : (
-    <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M4 10.5l8-6 8 6" />
-      <path d="M6 9.8V20h12V9.8" />
-    </svg>
   );
 }
 
-export default function MobileBottomNav() {
+function CartSelectorSheet({ open, onClose, counts }) {
+  useEffect(() => {
+    if (!open) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open, onClose]);
+
+  return (
+    <div className={`fixed inset-0 z-[60] transition ${open ? "pointer-events-auto" : "pointer-events-none"}`} aria-hidden={!open}>
+      <button
+        type="button"
+        onClick={onClose}
+        className={`absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] transition ${open ? "opacity-100" : "opacity-0"}`}
+      />
+
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-label="Selector de carritos"
+        className={`absolute bottom-0 left-0 right-0 rounded-t-[2rem] border border-slate-200 bg-white p-4 shadow-2xl transition-transform duration-300 ${
+          open ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        <div className="mb-3 flex items-start justify-between gap-2">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Carritos</p>
+            <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-900">Selecciona tu carrito</h2>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+            Cerrar
+          </button>
+        </div>
+
+        <div className="space-y-2">
+          <Link
+            href="/shopping/comida/cart"
+            onClick={onClose}
+            className="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3"
+          >
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Carrito · Comida</p>
+              <p className="text-xs text-slate-600">Items de lacena, nevera y congelador</p>
+            </div>
+            <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-emerald-700">{counts.comida} lineas</span>
+          </Link>
+
+          <Link
+            href="/shopping/casa/cart"
+            onClick={onClose}
+            className="flex items-center justify-between rounded-2xl border border-cyan-200 bg-cyan-50 px-3 py-3"
+          >
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Carrito · Casa</p>
+              <p className="text-xs text-slate-600">Aseo casa, aseo personal y mejoras</p>
+            </div>
+            <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-cyan-700">{counts.casa} lineas</span>
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+export default function MobileBottomNav({ cartBadgeCounts }) {
   const pathname = usePathname();
+  const [cartSheetOpen, setCartSheetOpen] = useState(false);
+
   const shoppingActive = isActive(pathname, "/shopping");
   const inventoryActive = isActive(pathname, "/inventory");
   const homeActive = isActive(pathname, "/");
-  const adminActive = isActive(pathname, "/admin");
   const foodActive = isActive(pathname, "/inventory/comida/disponibles");
+  const cartActive = isActive(pathname, "/shopping/comida/cart") || isActive(pathname, "/shopping/casa/cart");
+
+  const counts = {
+    comida: Number(cartBadgeCounts?.comida_lines || 0),
+    casa: Number(cartBadgeCounts?.casa_lines || 0),
+    total: Number(cartBadgeCounts?.total_lines || 0),
+  };
 
   return (
-    <div className="ios-bottom-nav md:hidden">
-      <div className="ios-bottom-shell">
-        <Link href="/shopping" className={`ios-bottom-tab ${shoppingActive ? "ios-bottom-tab-active" : ""}`}>
-          <TabIcon type="shopping" active={shoppingActive} />
-          <span>Compra</span>
-        </Link>
+    <>
+      <div className="ios-bottom-nav md:hidden">
+        <div className="ios-bottom-shell">
+          <Link href="/shopping" className={`ios-bottom-tab ${shoppingActive ? "ios-bottom-tab-active" : ""}`}>
+            <TabIcon type="shopping" active={shoppingActive} />
+            <span>Compra</span>
+          </Link>
 
-        <Link href="/inventory" className={`ios-bottom-tab ${inventoryActive ? "ios-bottom-tab-active" : ""}`}>
-          <TabIcon type="inventory" active={inventoryActive} />
-          <span>Inventario</span>
-        </Link>
+          <Link href="/inventory" className={`ios-bottom-tab ${inventoryActive ? "ios-bottom-tab-active" : ""}`}>
+            <TabIcon type="inventory" active={inventoryActive} />
+            <span>Inventario</span>
+          </Link>
 
-        <Link href="/" className={`ios-home-pill ${homeActive ? "ios-home-pill-active" : ""}`} aria-label="Inicio">
-          <TabIcon type="home" active />
-        </Link>
+          <Link href="/" className={`ios-home-pill ${homeActive ? "ios-home-pill-active" : ""}`} aria-label="Inicio">
+            <TabIcon type="home" active />
+          </Link>
 
-        <Link href="/inventory/comida/disponibles" className={`ios-bottom-tab ${foodActive ? "ios-bottom-tab-active" : ""}`}>
-          <TabIcon type="food" active={foodActive} />
-          <span>Nuestra</span>
-        </Link>
+          <Link href="/inventory/comida/disponibles" className={`ios-bottom-tab ${foodActive ? "ios-bottom-tab-active" : ""}`}>
+            <TabIcon type="food" active={foodActive} />
+            <span>Nuestra</span>
+          </Link>
 
-        <Link href="/admin" className={`ios-bottom-tab ${adminActive ? "ios-bottom-tab-active" : ""}`}>
-          <TabIcon type="admin" active={adminActive} />
-          <span>Admin</span>
-        </Link>
+          <button type="button" onClick={() => setCartSheetOpen(true)} className={`ios-bottom-tab ${cartActive ? "ios-bottom-tab-active" : ""}`}>
+            <div className="relative">
+              <TabIcon type="cart" active={cartActive} />
+              {counts.total > 0 ? (
+                <span className="absolute -right-2 -top-2 min-w-4 rounded-full bg-rose-600 px-1 text-center text-[10px] font-bold leading-4 text-white">
+                  {counts.total > 99 ? "99+" : counts.total}
+                </span>
+              ) : null}
+            </div>
+            <span>Carrito</span>
+          </button>
+        </div>
       </div>
-    </div>
+
+      <CartSelectorSheet open={cartSheetOpen} onClose={() => setCartSheetOpen(false)} counts={counts} />
+    </>
   );
 }
