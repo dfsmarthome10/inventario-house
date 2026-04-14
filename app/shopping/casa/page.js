@@ -3,7 +3,7 @@ import ShoppingCartPanel from "@/components/shopping/ShoppingCartPanel";
 import ThumbnailImage from "@/components/common/ThumbnailImage";
 import { getOrCreateOpenHouseSession, getHouseCatalog, getSessionCart } from "@/lib/shoppingRepository";
 import { getHouseSubcategoryLabel, HOUSE_SUBCATEGORIES } from "@/lib/house";
-import { addToCasaCartAction, confirmCasaPurchaseAction, removeCasaCartLineAction, updateCasaCartLineAction } from "./actions";
+import { addToCasaCartAction, confirmCasaPurchaseAction, createHouseItemFromShoppingAction, removeCasaCartLineAction, updateCasaCartLineAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +21,50 @@ function buildClearHref(searchParams = {}) {
     return `/shopping/casa?subcategoria=${encodeURIComponent(zone)}`;
   }
   return "/shopping/casa";
+}
+
+function ShoppingStatusBanner({ searchParams }) {
+  const status = typeof searchParams?.status === "string" ? searchParams.status : "";
+  const id = typeof searchParams?.id === "string" ? searchParams.id : "";
+  const duplicateId = typeof searchParams?.duplicate_id === "string" ? searchParams.duplicate_id : "";
+
+  if (!status) {
+    return null;
+  }
+
+  if (status === "created" && id) {
+    return (
+      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+        Item {id} creado correctamente.
+      </div>
+    );
+  }
+
+  if (status === "created_and_added" && id) {
+    return (
+      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+        Item {id} creado y agregado al carrito.
+      </div>
+    );
+  }
+
+  if (status === "duplicate") {
+    return (
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        Ya existe un item con nombre similar en esta subcategoria.
+        {duplicateId ? (
+          <>
+            {" "}
+            <Link href={`/item/${encodeURIComponent(duplicateId)}`} className="font-semibold underline underline-offset-2">
+              Ver {duplicateId}
+            </Link>
+          </>
+        ) : null}
+      </div>
+    );
+  }
+
+  return null;
 }
 
 export default async function ShoppingCasaPage({ searchParams }) {
@@ -76,6 +120,8 @@ export default async function ShoppingCasaPage({ searchParams }) {
         </div>
       </section>
 
+      <ShoppingStatusBanner searchParams={searchParams || {}} />
+
       <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
         <form method="get" className="grid gap-3 sm:grid-cols-4 sm:items-end">
           <label className="flex flex-col gap-1 sm:col-span-2">
@@ -111,6 +157,69 @@ export default async function ShoppingCasaPage({ searchParams }) {
               Limpiar
             </a>
           </div>
+        </form>
+      </section>
+
+      <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <div>
+            <h2 className="text-base font-semibold tracking-tight text-slate-900">Nuevo item de casa</h2>
+            <p className="text-xs text-slate-500">Crea rapido un item cuando no exista y opcionalmente agrégalo al carrito.</p>
+          </div>
+          <span className="rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+            Creacion rapida
+          </span>
+        </div>
+        <form action={createHouseItemFromShoppingAction} className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[1.3fr_0.8fr_0.9fr_0.9fr_auto] lg:items-end">
+          <label className="flex flex-col gap-1">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Nombre *</span>
+            <input
+              type="text"
+              name="nombre"
+              required
+              defaultValue={typeof searchParams?.search === "string" ? searchParams.search : ""}
+              placeholder="Ej: Gel antibacterial"
+              className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900"
+            />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Subcategoria *</span>
+            <select
+              name="subcategoria"
+              required
+              defaultValue={typeof searchParams?.subcategoria === "string" ? searchParams.subcategoria : "aseo_casa"}
+              className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900"
+            >
+              {HOUSE_SUBCATEGORIES.map((sub) => (
+                <option key={sub} value={sub}>
+                  {getHouseSubcategoryLabel(sub)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Cant. para carrito</span>
+            <input type="number" min="1" name="quantity_to_buy" defaultValue="1" className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900" />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Precio actual</span>
+            <input type="number" min="0" step="0.01" name="purchase_price" defaultValue="0" className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900" />
+          </label>
+          <button type="submit" className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800">
+            Crear item
+          </button>
+          <label className="sm:col-span-2 lg:col-span-5 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
+            <input type="checkbox" name="add_to_cart" value="1" defaultChecked className="h-4 w-4 rounded border-slate-300" />
+            <span className="text-sm text-slate-700">Agregar automaticamente al carrito despues de crear</span>
+          </label>
+          <label className="sm:col-span-2 lg:col-span-5 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
+            <input type="checkbox" name="tax_applies" value="1" className="h-4 w-4 rounded border-slate-300" />
+            <span className="text-sm text-slate-700">Aplica impuesto 11.5% para esta linea inicial</span>
+          </label>
+          <label className="sm:col-span-2 lg:col-span-5 flex flex-col gap-1">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Thumbnail URL (opcional)</span>
+            <input type="url" name="thumbnail_url" placeholder="https://..." className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900" />
+          </label>
         </form>
       </section>
 
