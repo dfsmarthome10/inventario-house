@@ -1,6 +1,7 @@
 import Link from "next/link";
 import ThumbnailImage from "@/components/common/ThumbnailImage";
 import { getAllItems } from "@/lib/inventoryRepository";
+import { getSoonExpirationInfo } from "@/lib/expiration";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,8 @@ function normalizeSearch(searchParams) {
 }
 
 function ItemRow({ item }) {
+  const soonExpiration = getSoonExpirationInfo(item);
+
   return (
     <Link
       href={`/item/${encodeURIComponent(item.id)}`}
@@ -63,6 +66,16 @@ function ItemRow({ item }) {
           {safeNumber(item.cantidad_actual)}
           {item.unidad ? ` ${item.unidad}` : ""}
         </p>
+        {soonExpiration ? (
+          <p
+            className={`mt-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+              soonExpiration.tone === "danger" ? "bg-rose-600 text-white" : "bg-amber-100 text-amber-800"
+            }`}
+            title={`Lote mas cercano: ${soonExpiration.expiresOn}`}
+          >
+            {soonExpiration.label}
+          </p>
+        ) : null}
       </div>
     </Link>
   );

@@ -4,6 +4,7 @@ import DeleteItemControl from "@/components/admin/DeleteItemControl";
 import { getStockPriority, isLowStock } from "@/lib/inventoryFilters";
 import { getItemsByCategory } from "@/lib/inventoryRepository";
 import { buildFullNfcUrl } from "@/lib/nfc";
+import { getSoonExpirationInfo } from "@/lib/expiration";
 import { decrementQuantityAction, deleteItemAction, disableLowStockAlertAction, incrementQuantityAction, setLowStockThresholdAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -240,6 +241,7 @@ function ItemAdminCard({ item }) {
   const nfcLabel = item.nfc_mode === "item" ? "Item NFC" : item.nfc_mode === "zone" ? "Zona NFC" : "Sin NFC";
   const nfcUrl = item.nfc_target_path ? buildFullNfcUrl(item.nfc_target_path) : "";
   const priority = getStockPriority(item);
+  const soonExpiration = getSoonExpirationInfo(item);
 
   return (
     <article key={item.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -264,6 +266,16 @@ function ItemAdminCard({ item }) {
               <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${item.expiration_enabled ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-700"}`}>
                 {item.expiration_enabled ? `Expira: ${Array.isArray(item.expiration_dates) ? item.expiration_dates.length : 0} lote(s)` : "Sin expiracion"}
               </span>
+              {soonExpiration ? (
+                <span
+                  className={`rounded-full px-2 py-1 text-[11px] font-semibold ${
+                    soonExpiration.tone === "danger" ? "bg-rose-600 text-white" : "bg-amber-100 text-amber-800"
+                  }`}
+                  title={`Lote mas cercano: ${soonExpiration.expiresOn}`}
+                >
+                  {soonExpiration.label}
+                </span>
+              ) : null}
             </div>
           ) : null}
           <div className="mt-1 flex flex-wrap gap-1.5">

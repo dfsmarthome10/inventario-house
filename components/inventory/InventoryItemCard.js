@@ -1,6 +1,7 @@
 import Link from "next/link";
 import ThumbnailImage from "@/components/common/ThumbnailImage";
 import { getStockPriority, isLowStock } from "@/lib/inventoryFilters";
+import { getSoonExpirationInfo } from "@/lib/expiration";
 
 const PRIORITY_META = {
   critical: {
@@ -33,6 +34,7 @@ export default function InventoryItemCard({ item, variant = "default" }) {
   const priority = getStockPriority(item);
   const priorityMeta = PRIORITY_META[priority] || PRIORITY_META.normal;
   const showroom = variant === "showroom";
+  const soonExpiration = getSoonExpirationInfo(item);
 
   return (
     <Link
@@ -56,6 +58,16 @@ export default function InventoryItemCard({ item, variant = "default" }) {
         <div className="flex flex-col items-end gap-1">
           <span className="rounded-xl bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">{quantityLabel}</span>
           <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${priorityMeta.chip}`}>{priorityMeta.label}</span>
+          {soonExpiration ? (
+            <span
+              className={`rounded-full px-2 py-1 text-[11px] font-semibold ${
+                soonExpiration.tone === "danger" ? "bg-rose-600 text-white" : "bg-amber-100 text-amber-800"
+              }`}
+              title={`Lote mas cercano: ${soonExpiration.expiresOn}`}
+            >
+              {soonExpiration.label}
+            </span>
+          ) : null}
         </div>
       </div>
       <p className="mt-2 text-sm text-slate-600">Ubicacion: {item.ubicacion}</p>
