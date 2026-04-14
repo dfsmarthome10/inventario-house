@@ -35,6 +35,143 @@ const PRIORITY_META = {
   normal: "bg-emerald-100 text-emerald-700",
 };
 
+const SUBCATEGORY_LABELS = {
+  ...FOOD_SUBCATEGORY_META,
+  ...HOUSE_SUBCATEGORY_META,
+};
+
+const PRIORITY_OPTIONS = ["critical", "high", "medium", "normal"];
+
+function getQueryParam(searchParams, key) {
+  const raw = searchParams?.[key];
+  if (Array.isArray(raw)) {
+    return raw[0] || "";
+  }
+  return typeof raw === "string" ? raw : "";
+}
+
+function buildFilters(searchParams) {
+  return {
+    search: getQueryParam(searchParams, "search").trim().toLowerCase(),
+    categoria_principal: getQueryParam(searchParams, "categoria_principal").trim().toLowerCase(),
+    subcategoria: getQueryParam(searchParams, "subcategoria").trim().toLowerCase(),
+    priority: getQueryParam(searchParams, "priority").trim().toLowerCase(),
+    low_stock: getQueryParam(searchParams, "low_stock") === "1",
+  };
+}
+
+function itemMatchesFilters(item, filters) {
+  if (filters.search) {
+    const haystack = `${item.id} ${item.alias} ${item.nombre}`.toLowerCase();
+    if (!haystack.includes(filters.search)) {
+      return false;
+    }
+  }
+
+  if (filters.categoria_principal && item.categoria_principal !== filters.categoria_principal) {
+    return false;
+  }
+
+  if (filters.subcategoria && (item.subcategoria || "") !== filters.subcategoria) {
+    return false;
+  }
+
+  const priority = getStockPriority(item);
+  if (filters.priority && priority !== filters.priority) {
+    return false;
+  }
+
+  if (filters.low_stock && !isLowStock(item)) {
+    return false;
+  }
+
+  return true;
+}
+
+function getAvailableSubcategories(grouped) {
+  const set = new Set();
+  Object.values(grouped).forEach((block) => {
+    const subs = block?.subcategorias || {};
+    Object.keys(subs).forEach((key) => {
+      if (subs[key]?.length) {
+        set.add(key);
+      }
+    });
+    (block?.items || []).forEach((item) => {
+      if (item.subcategoria) {
+        set.add(item.subcategoria);
+      }
+    });
+  });
+  return Array.from(set).sort((a, b) => (SUBCATEGORY_LABELS[a] || a).localeCompare(SUBCATEGORY_LABELS[b] || b, "es"));
+}
+
+function AdminFilterBar({ filters, subcategoryOptions }) {
+  return (
+    <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+      <form method="get" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+        <label className="flex flex-col gap-1 lg:col-span-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Buscar item</span>
+          <input
+            name="search"
+            defaultValue={filters.search}
+            placeholder="Nombre, alias o ID"
+            className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900"
+          />
+        </label>
+
+        <label className="flex flex-col gap-1">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Categoria</span>
+          <select name="categoria_principal" defaultValue={filters.categoria_principal} className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900">
+            <option value="">Todas</option>
+            {Object.entries(MAIN_CATEGORY_META).map(([key, meta]) => (
+              <option key={key} value={key}>
+                {meta.title}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-1">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Subcategoria</span>
+          <select name="subcategoria" defaultValue={filters.subcategoria} className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900">
+            <option value="">Todas</option>
+            {subcategoryOptions.map((sub) => (
+              <option key={sub} value={sub}>
+                {SUBCATEGORY_LABELS[sub] || sub}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-1">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Prioridad</span>
+          <select name="priority" defaultValue={filters.priority} className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900">
+            <option value="">Todas</option>
+            {PRIORITY_OPTIONS.map((level) => (
+              <option key={level} value={level}>
+                {level}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 lg:self-end">
+          <input type="checkbox" name="low_stock" value="1" defaultChecked={filters.low_stock} className="h-4 w-4 rounded border-slate-300" />
+          <span className="text-sm text-slate-700">Solo bajo stock</span>
+        </label>
+
+        <div className="flex gap-2 sm:col-span-2 lg:col-span-6">
+          <button type="submit" className="rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">Aplicar</button>
+          <Link href="/admin" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            Limpiar
+          </Link>
+        </div>
+      </form>
+    </section>
+  );
+}
+
 function QuantityActions({ itemId }) {
   return (
     <div className="flex items-center gap-2">
@@ -189,7 +326,37 @@ function StatusBanner({ status, id }) {
 }
 
 export default async function AdminPage({ searchParams }) {
-  const grouped = await getItemsByCategory();
+  const groupedRaw = await getItemsByCategory();
+  const filters = buildFilters(searchParams || {});
+  const subcategoryOptions = getAvailableSubcategories(groupedRaw);
+
+  const grouped = Object.fromEntries(
+    Object.entries(groupedRaw).map(([mainCategory, block]) => {
+      const filteredSubcategorias = Object.fromEntries(
+        Object.entries(block?.subcategorias || {}).map(([subKey, list]) => [
+          subKey,
+          (list || []).filter((item) => itemMatchesFilters(item, filters)),
+        ])
+      );
+
+      const filteredItems = (block?.items || []).filter((item) => itemMatchesFilters(item, filters));
+
+      return [
+        mainCategory,
+        {
+          ...block,
+          subcategorias: filteredSubcategorias,
+          items: filteredItems,
+        },
+      ];
+    })
+  );
+
+  const filteredAllItems = Object.values(grouped).flatMap((block) => [
+    ...(block?.items || []),
+    ...Object.values(block?.subcategorias || {}).flatMap((list) => list || []),
+  ]);
+  const lowStockFilteredCount = filteredAllItems.filter((item) => isLowStock(item)).length;
 
   return (
     <main className="space-y-5">
@@ -210,6 +377,27 @@ export default async function AdminPage({ searchParams }) {
       </section>
 
       <StatusBanner status={searchParams?.status} id={searchParams?.id} />
+
+      <AdminFilterBar filters={filters} subcategoryOptions={subcategoryOptions} />
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="grid gap-2 sm:grid-cols-3">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-[11px] uppercase tracking-wide text-slate-500">Resultados</p>
+            <p className="mt-1 text-lg font-semibold text-slate-900">{filteredAllItems.length}</p>
+          </div>
+          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-3">
+            <p className="text-[11px] uppercase tracking-wide text-rose-600">Bajo stock (resultado)</p>
+            <p className="mt-1 text-lg font-semibold text-rose-700">{lowStockFilteredCount}</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-[11px] uppercase tracking-wide text-slate-500">Filtro activo</p>
+            <p className="mt-1 text-sm font-semibold text-slate-700">
+              {filters.search || filters.categoria_principal || filters.subcategoria || filters.priority || filters.low_stock ? "Si" : "No"}
+            </p>
+          </div>
+        </div>
+      </section>
 
       <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
