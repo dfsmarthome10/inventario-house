@@ -53,6 +53,12 @@ export async function createItemAction(previousState, formData) {
   revalidatePath("/inventory/casa/aseo-casa");
   revalidatePath("/inventory/casa/aseo-personal");
   revalidatePath("/inventory/casa/mejoras-casa");
+  revalidatePath("/inventory/gabinete");
+  revalidatePath("/inventory/gabinete/gavetero-principal");
+  revalidatePath("/inventory/gabinete/gavetero-1");
+  revalidatePath("/inventory/gabinete/gavetero-2");
+  revalidatePath("/inventory/gabinete/gavetero-3");
+  revalidatePath("/inventory/gabinete/gavetero-4");
   revalidatePath("/inventory/cajas");
   revalidatePath("/inventory/herramientas");
   revalidatePath("/admin");

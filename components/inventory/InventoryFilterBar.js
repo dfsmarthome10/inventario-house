@@ -5,6 +5,7 @@ const CATEGORY_LABELS = {
   herramientas: "Herramientas",
   comida: "Comida",
   casa: "Casa",
+  gabinete: "Gabinete",
   otros: "Otros",
 };
 
@@ -15,7 +16,46 @@ const SUBCATEGORY_LABELS = {
   aseo_casa: "Aseo Casa",
   aseo_personal: "Aseo Personal",
   mejoras_casa: "Mejoras Casa",
+  gavetero_principal: "Gavetero Principal",
+  gavetero_1: "Gavetero 1",
+  gavetero_2: "Gavetero 2",
+  gavetero_3: "Gavetero 3",
+  gavetero_4: "Gavetero 4",
 };
+
+function buildClearHref(selectedCategory, selectedSubcategory) {
+  if (!selectedSubcategory) {
+    return selectedCategory ? `/inventory/${selectedCategory}` : "/inventory";
+  }
+
+  const foodSubs = new Set(["lacena", "nevera", "congelador"]);
+  const houseSlugByKey = {
+    aseo_casa: "aseo-casa",
+    aseo_personal: "aseo-personal",
+    mejoras_casa: "mejoras-casa",
+  };
+  const gabineteSlugByKey = {
+    gavetero_principal: "gavetero-principal",
+    gavetero_1: "gavetero-1",
+    gavetero_2: "gavetero-2",
+    gavetero_3: "gavetero-3",
+    gavetero_4: "gavetero-4",
+  };
+
+  if (foodSubs.has(selectedSubcategory)) {
+    return `/inventory/comida/${selectedSubcategory}`;
+  }
+
+  if (houseSlugByKey[selectedSubcategory]) {
+    return `/inventory/casa/${houseSlugByKey[selectedSubcategory]}`;
+  }
+
+  if (gabineteSlugByKey[selectedSubcategory]) {
+    return `/inventory/gabinete/${gabineteSlugByKey[selectedSubcategory]}`;
+  }
+
+  return selectedCategory ? `/inventory/${selectedCategory}` : "/inventory";
+}
 
 export default function InventoryFilterBar({
   searchParams,
@@ -81,7 +121,7 @@ export default function InventoryFilterBar({
 
       <div className="mt-3 flex items-center gap-2">
         <button type="submit" className="rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">Aplicar</button>
-        <a href={selectedSubcategory ? `/inventory/comida/${selectedSubcategory}` : selectedCategory ? `/inventory/${selectedCategory}` : "/inventory"} className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+        <a href={buildClearHref(selectedCategory, selectedSubcategory)} className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
           Limpiar
         </a>
       </div>

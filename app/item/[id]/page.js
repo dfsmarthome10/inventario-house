@@ -121,6 +121,18 @@ export default async function ItemDetailPage({ params }) {
             <dt className="font-medium text-slate-700">NFC mode</dt>
             <dd className="mt-1 text-slate-600">{item.nfc_mode || "none"}</dd>
           </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <dt className="font-medium text-slate-700">Tipo de contenedor</dt>
+            <dd className="mt-1 text-slate-600">{item.container_type || "direct_item"}</dd>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <dt className="font-medium text-slate-700">Contenedor padre</dt>
+            <dd className="mt-1 text-slate-600">{item.parent_container_name || "N/A"}</dd>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <dt className="font-medium text-slate-700">Sistema logico</dt>
+            <dd className="mt-1 text-slate-600">{item.sistema_logico ? "Si" : "No"}</dd>
+          </div>
           {item.categoria_principal === "comida" ? (
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
               <dt className="font-medium text-slate-700">Expiracion activa</dt>

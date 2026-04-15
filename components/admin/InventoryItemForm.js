@@ -8,6 +8,7 @@ const MAIN_CATEGORY_OPTIONS = [
   { value: "herramientas", label: "Herramientas" },
   { value: "comida", label: "Comida" },
   { value: "casa", label: "Casa" },
+  { value: "gabinete", label: "Gabinete" },
   { value: "otros", label: "Otros" },
 ];
 
@@ -18,6 +19,11 @@ const FOOD_SUBCATEGORY_OPTIONS = [
   { value: "aseo_casa", label: "Aseo Casa" },
   { value: "aseo_personal", label: "Aseo Personal" },
   { value: "mejoras_casa", label: "Mejoras Casa" },
+  { value: "gavetero_principal", label: "Gavetero Principal" },
+  { value: "gavetero_1", label: "Gavetero 1" },
+  { value: "gavetero_2", label: "Gavetero 2" },
+  { value: "gavetero_3", label: "Gavetero 3" },
+  { value: "gavetero_4", label: "Gavetero 4" },
 ];
 
 function SubmitButton({ label }) {
@@ -169,7 +175,7 @@ export default function InventoryItemForm({
         </label>
 
         <label className="block">
-          <span className="text-sm font-medium text-slate-700">Subcategoria (comida/casa)</span>
+          <span className="text-sm font-medium text-slate-700">Subcategoria (comida/casa/gabinete)</span>
           <input
             name="subcategoria"
             list="food-subcategory-options"
@@ -182,7 +188,7 @@ export default function InventoryItemForm({
               <option key={value} value={value} />
             ))}
           </datalist>
-          <p className="mt-1 text-xs text-slate-500">Comida: lacena/nevera/congelador. Casa: aseo_casa/aseo_personal/mejoras_casa.</p>
+          <p className="mt-1 text-xs text-slate-500">Comida: lacena/nevera/congelador. Casa: aseo_casa/aseo_personal/mejoras_casa. Gabinete: gavetero_principal/gavetero_1..4.</p>
           <ErrorText text={state?.errors?.subcategoria} />
         </label>
 

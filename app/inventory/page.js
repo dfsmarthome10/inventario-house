@@ -45,6 +45,9 @@ export default async function InventoryPage({ searchParams }) {
               <Link href="/shopping/casa?low_stock=1" className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-50">
                 Reponer casa
               </Link>
+              <Link href="/inventory/gabinete" className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-50">
+                Hub gabinete
+              </Link>
             </div>
           </div>
         </div>

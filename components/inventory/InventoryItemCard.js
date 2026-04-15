@@ -76,6 +76,12 @@ export default function InventoryItemCard({ item, variant = "default" }) {
         {item.subcategoria ? (
           <span className="rounded-full bg-emerald-100 px-2 py-1 font-medium text-emerald-700">{item.subcategoria}</span>
         ) : null}
+        {item.container_type ? (
+          <span className="rounded-full bg-violet-100 px-2 py-1 font-medium text-violet-700">{item.container_type}</span>
+        ) : null}
+        {item.sistema_logico ? (
+          <span className="rounded-full bg-cyan-100 px-2 py-1 font-medium text-cyan-700">sistema</span>
+        ) : null}
       </div>
       {lowStock && (item.categoria_principal === "comida" || item.categoria_principal === "casa") ? (
         <div className="mt-2">

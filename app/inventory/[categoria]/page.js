@@ -9,6 +9,7 @@ import FoodHubQuickControls from "@/components/inventory/FoodHubQuickControls";
 import { FOOD_SUBCATEGORIES, HOUSE_SUBCATEGORIES, applyInventoryFilters, getCategoryOptionsFromItems, getStockPriority, isLowStock } from "@/lib/inventoryFilters";
 import { getAllItems } from "@/lib/inventoryRepository";
 import { getHouseSubcategoryLabel, HOUSE_ZONE_KEY_TO_SLUG } from "@/lib/house";
+import { GABINETE_SUBCATEGORIES, GABINETE_ZONE_KEY_TO_SLUG, getGabineteSubcategoryLabel } from "@/lib/gabinete";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,7 @@ const TITLES = {
   herramientas: "Hub de herramientas",
   comida: "Hub de comida",
   casa: "Hub de casa",
+  gabinete: "Hub de gabinete",
   otros: "Hub de otros",
 };
 
@@ -35,13 +37,40 @@ const HOUSE_META = {
   },
 };
 
+const GABINETE_META = {
+  gavetero_principal: {
+    tone: "border-violet-200 bg-violet-50",
+    description: "Zona hibrida: backlog de reparacion, recuerdos, coleccion y piezas voluminosas.",
+  },
+  gavetero_1: {
+    tone: "border-slate-200 bg-slate-50",
+    description: "Area de perforacion, tornilleria estructural y herramientas de mano.",
+  },
+  gavetero_2: {
+    tone: "border-amber-200 bg-amber-50",
+    description: "Trabajo fino de construccion, acabado y concreto en progreso.",
+  },
+  gavetero_3: {
+    tone: "border-cyan-200 bg-cyan-50",
+    description: "Hub tecnologico, energia, DIY y electronica.",
+  },
+  gavetero_4: {
+    tone: "border-slate-200 bg-slate-50",
+    description: "Reservado, pendiente de poblar.",
+  },
+};
+
 function buildQuery(searchParams, extras = {}) {
   const p = new URLSearchParams();
   if (searchParams?.search) p.set("search", searchParams.search);
   if (searchParams?.low_stock === "1") p.set("low_stock", "1");
   if (searchParams?.available_only === "1") p.set("available_only", "1");
   Object.entries(extras).forEach(([key, value]) => {
-    if (value) p.set(key, value);
+    if (value === null || value === "") {
+      p.delete(key);
+    } else {
+      p.set(key, value);
+    }
   });
   const q = p.toString();
   return q ? `?${q}` : "";
@@ -95,6 +124,35 @@ function CasaQuickControls({ searchParams }) {
   );
 }
 
+function GabineteQuickControls({ searchParams }) {
+  const activeZone = searchParams?.subcategoria || "";
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Gavetero</span>
+      <Link
+        href={`/inventory/gabinete${buildQuery(searchParams, { subcategoria: null })}`}
+        className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+          !activeZone ? "border-violet-700 bg-violet-700 text-white" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+        }`}
+      >
+        Todos
+      </Link>
+      {GABINETE_SUBCATEGORIES.map((sub) => (
+        <Link
+          key={sub}
+          href={`/inventory/gabinete${buildQuery(searchParams, { subcategoria: sub })}`}
+          className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+            activeZone === sub ? "border-violet-700 bg-violet-700 text-white" : "border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100"
+          }`}
+        >
+          {getGabineteSubcategoryLabel(sub)}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 export default async function InventoryCategoryPage({ params, searchParams }) {
   const categoria = params.categoria;
   const items = await getAllItems();
@@ -126,6 +184,13 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
     : houseFilteredBase;
   const houseZonesToRender = HOUSE_SUBCATEGORIES.includes(zoneFilter) ? [zoneFilter] : HOUSE_SUBCATEGORIES;
 
+  const gabineteFilteredBase = filtered.filter((item) => item.categoria_principal === "gabinete");
+  const gabineteAll = items.filter((item) => item.categoria_principal === "gabinete");
+  const gabineteFiltered = availableOnly
+    ? gabineteFilteredBase.filter((item) => typeof item.cantidad_actual === "number" && item.cantidad_actual >= 1)
+    : gabineteFilteredBase;
+  const gabineteZonesToRender = GABINETE_SUBCATEGORIES.includes(zoneFilter) ? [zoneFilter] : GABINETE_SUBCATEGORIES;
+
   return (
     <main className="space-y-4">
       <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -135,6 +200,8 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
             ? "Gestiona lacena, nevera y congelador con filtros rapidos."
             : categoria === "casa"
               ? "Gestiona aseo casa, aseo personal y mejoras con flujo de reposicion premium."
+              : categoria === "gabinete"
+                ? "Explora el gabinete por gaveteros, con estructura fisica, contenedores y sistemas."
               : "Vista enfocada por categoria principal."}
         </p>
       </section>
@@ -317,7 +384,72 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
         </section>
       ) : null}
 
-      {categoria !== "comida" && categoria !== "casa" ? (
+      {categoria === "gabinete" ? (
+        <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="space-y-4">
+            <div className="rounded-3xl border border-violet-200 bg-violet-50 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Gabinete total</p>
+                  <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-900">Estructura fisica por gaveteros</h2>
+                  <p className="mt-1 text-sm text-slate-600">Contenedores tematicos, items directos y sistemas completos integrados en una vista clara.</p>
+                </div>
+                <div className="grid min-w-[150px] grid-cols-2 gap-2 text-xs">
+                  <div className="rounded-xl border border-white/80 bg-white px-3 py-2">
+                    <p className="font-semibold text-slate-900">{gabineteAll.length}</p>
+                    <p className="text-slate-500">Total gabinete</p>
+                  </div>
+                  <div className="rounded-xl border border-white/80 bg-white px-3 py-2">
+                    <p className="font-semibold text-rose-700">{gabineteAll.filter((item) => isLowStock(item)).length}</p>
+                    <p className="text-slate-500">Stock bajo</p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4">
+                <GabineteQuickControls searchParams={searchParams || {}} />
+              </div>
+            </div>
+
+            <FoodFilterBar searchParams={searchParams || {}} clearHref={availableOnly ? "/inventory/gabinete?available_only=1" : "/inventory/gabinete"} />
+
+            {gabineteZonesToRender.map((sub) => {
+              const zoneItems = gabineteFiltered.filter((item) => item.subcategoria === sub);
+              const lowStock = zoneItems.filter((item) => isLowStock(item)).length;
+              const slug = GABINETE_ZONE_KEY_TO_SLUG[sub];
+
+              return (
+                <div key={sub} className={`rounded-3xl border p-4 ${GABINETE_META[sub]?.tone || "border-slate-200 bg-slate-50"}`}>
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-700">{getGabineteSubcategoryLabel(sub)}</h2>
+                      <span className="rounded-full bg-white px-2.5 py-1 text-xs font-medium text-slate-700">{zoneItems.length}</span>
+                      <span className="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-700">{lowStock} bajos</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Link
+                        href={`/inventory/gabinete/${slug}${buildQuery(searchParams)}`}
+                        className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+                      >
+                        Abrir gavetero
+                      </Link>
+                    </div>
+                  </div>
+                  <p className="mb-3 text-xs text-slate-600">{GABINETE_META[sub]?.description}</p>
+                  {zoneItems.length === 0 ? (
+                    <p className="text-sm text-slate-500">Sin items en esta zona por ahora.</p>
+                  ) : (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {zoneItems.slice(0, 6).map((item) => <InventoryItemCard key={item.id} item={item} variant="showroom" />)}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+
+      {categoria !== "comida" && categoria !== "casa" && categoria !== "gabinete" ? (
         <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           {filtered.length === 0 ? (
             <p className="text-sm text-slate-500">No hay items para esta categoria con los filtros actuales.</p>

@@ -14,6 +14,7 @@ const MAIN_CATEGORY_META = {
   herramientas: { title: "Herramientas", accent: "bg-slate-200 text-slate-700" },
   comida: { title: "Comida", accent: "bg-emerald-100 text-emerald-700" },
   casa: { title: "Casa", accent: "bg-cyan-100 text-cyan-700" },
+  gabinete: { title: "Gabinete", accent: "bg-violet-100 text-violet-700" },
   otros: { title: "Otros", accent: "bg-indigo-100 text-indigo-700" },
 };
 
@@ -29,6 +30,14 @@ const HOUSE_SUBCATEGORY_META = {
   mejoras_casa: "Mejoras Casa",
 };
 
+const GABINETE_SUBCATEGORY_META = {
+  gavetero_principal: "Gavetero Principal",
+  gavetero_1: "Gavetero 1",
+  gavetero_2: "Gavetero 2",
+  gavetero_3: "Gavetero 3",
+  gavetero_4: "Gavetero 4",
+};
+
 const PRIORITY_META = {
   critical: "bg-rose-600 text-white",
   high: "bg-rose-100 text-rose-700",
@@ -39,6 +48,7 @@ const PRIORITY_META = {
 const SUBCATEGORY_LABELS = {
   ...FOOD_SUBCATEGORY_META,
   ...HOUSE_SUBCATEGORY_META,
+  ...GABINETE_SUBCATEGORY_META,
 };
 
 const PRIORITY_OPTIONS = ["critical", "high", "medium", "normal"];
@@ -437,9 +447,9 @@ export default async function AdminPage({ searchParams }) {
                   <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${meta.accent}`}>categoria principal</span>
                 </div>
 
-                {mainCategory === "comida" || mainCategory === "casa" ? (
+                {mainCategory === "comida" || mainCategory === "casa" || mainCategory === "gabinete" ? (
                   <div className="space-y-4">
-                    {Object.entries(mainCategory === "comida" ? FOOD_SUBCATEGORY_META : HOUSE_SUBCATEGORY_META).map(([subKey, subLabel]) => {
+                    {Object.entries(mainCategory === "comida" ? FOOD_SUBCATEGORY_META : mainCategory === "casa" ? HOUSE_SUBCATEGORY_META : GABINETE_SUBCATEGORY_META).map(([subKey, subLabel]) => {
                       const subItems = block?.subcategorias?.[subKey] || [];
 
                       return (
@@ -457,7 +467,7 @@ export default async function AdminPage({ searchParams }) {
                     {(block?.items?.length || 0) > 0 ? (
                       <div className="rounded-2xl border border-slate-200 bg-white p-4">
                         <h4 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600">
-                          {mainCategory === "comida" ? "Comida sin zona" : "Casa sin subcategoria"}
+                          {mainCategory === "comida" ? "Comida sin zona" : mainCategory === "casa" ? "Casa sin subcategoria" : "Gabinete sin gavetero"}
                         </h4>
                         <div className="grid gap-3">{block.items.map((item) => <ItemAdminCard key={item.id} item={item} />)}</div>
                       </div>

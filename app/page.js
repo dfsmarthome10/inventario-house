@@ -9,6 +9,7 @@ const CATEGORY_META = {
   herramientas: { title: "Herramientas", href: "/inventory/herramientas", tone: "bg-slate-200 text-slate-700" },
   comida: { title: "Comida", href: "/inventory/comida", tone: "bg-emerald-100 text-emerald-700" },
   casa: { title: "Casa", href: "/inventory/casa", tone: "bg-cyan-100 text-cyan-700" },
+  gabinete: { title: "Gabinete", href: "/inventory/gabinete", tone: "bg-violet-100 text-violet-700" },
   otros: { title: "Otros", href: "/inventory?categoria_principal=otros", tone: "bg-indigo-100 text-indigo-700" },
 };
 
@@ -53,6 +54,10 @@ export default async function HomePage() {
           <div className="col-span-2 rounded-2xl bg-cyan-50 p-3 sm:col-span-1 lg:col-span-1">
             <p className="text-[11px] uppercase tracking-wide text-cyan-600">Casa</p>
             <p className="mt-1 text-2xl font-semibold text-cyan-800">{summary.byMainCategory.casa || 0}</p>
+          </div>
+          <div className="col-span-2 rounded-2xl bg-violet-50 p-3 sm:col-span-1 lg:col-span-1">
+            <p className="text-[11px] uppercase tracking-wide text-violet-600">Gabinete</p>
+            <p className="mt-1 text-2xl font-semibold text-violet-800">{summary.byMainCategory.gabinete || 0}</p>
           </div>
         </div>
       </section>
@@ -120,6 +125,10 @@ export default async function HomePage() {
               ) : key === "casa" ? (
                 <p className="mt-1 text-[11px] text-slate-500">
                   aseo casa {summary.houseByZone.aseo_casa} | aseo personal {summary.houseByZone.aseo_personal} | mejoras {summary.houseByZone.mejoras_casa}
+                </p>
+              ) : key === "gabinete" ? (
+                <p className="mt-1 text-[11px] text-slate-500">
+                  principal {summary.gabineteByZone.gavetero_principal} | g1 {summary.gabineteByZone.gavetero_1} | g2 {summary.gabineteByZone.gavetero_2} | g3 {summary.gabineteByZone.gavetero_3} | g4 {summary.gabineteByZone.gavetero_4}
                 </p>
               ) : (
                 <p className="mt-1 text-[11px] text-slate-500">Abrir hub</p>
@@ -250,6 +259,10 @@ export default async function HomePage() {
         <Link href="/inventory/comida" className="ios-widget transition duration-200 hover:-translate-y-px hover:shadow">
           <h3 className="text-sm font-semibold text-slate-900">Gestionar comida</h3>
           <p className="mt-1 text-xs text-slate-600">Vista por zonas: nevera, congelador y lacena.</p>
+        </Link>
+        <Link href="/inventory/gabinete" className="ios-widget transition duration-200 hover:-translate-y-px hover:shadow">
+          <h3 className="text-sm font-semibold text-slate-900">Gestionar gabinete</h3>
+          <p className="mt-1 text-xs text-slate-600">Estructura fisica por gaveteros y contenedores tematicos.</p>
         </Link>
       </section>
     </main>
