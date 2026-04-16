@@ -3,6 +3,7 @@ import Link from "next/link";
 import MobileBottomNav from "@/components/navigation/MobileBottomNav";
 import MobileTopMenu from "@/components/navigation/MobileTopMenu";
 import PWAClientSetup from "@/components/pwa/PWAClientSetup";
+import PWAInstallCard from "@/components/pwa/PWAInstallCard";
 import { getOpenCartBadgeCounts } from "@/lib/shoppingRepository";
 
 export const metadata = {
@@ -87,6 +88,7 @@ export default async function RootLayout({ children }) {
               </nav>
             </div>
           </header>
+          <PWAInstallCard />
           {children}
         </div>
         <MobileBottomNav cartBadgeCounts={cartBadgeCounts} />
