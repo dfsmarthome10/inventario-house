@@ -140,19 +140,19 @@ export async function confirmCasaPurchaseAction() {
   const session = await getOrCreateOpenHouseSession();
   const { receiptId, touchedItemIds } = await confirmHousePurchase(session.id);
   const allItems = await getAllItems();
-  const lowStockItems = allItems.filter((item) => item.categoria_principal === "casa" && isLowStock(item));
+  const lowStockItems = allItems.filter((item) => ["comida", "casa"].includes(item.categoria_principal) && isLowStock(item));
 
   await sendHomeAssistantEvent("purchase_confirmed", {
     receipt_id: receiptId,
     session_id: session.id,
-    scope: "casa",
+    scope: "household",
     touched_item_ids: touchedItemIds,
     low_stock_count: lowStockItems.length,
   });
 
   if (lowStockItems.length > 0) {
     await sendHomeAssistantEvent("low_stock_snapshot", {
-      scope: "casa",
+      scope: "household",
       count: lowStockItems.length,
       items: lowStockItems.slice(0, 20).map((item) => ({
         id: item.id,

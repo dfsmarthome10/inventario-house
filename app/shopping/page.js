@@ -7,8 +7,8 @@ export default function ShoppingEntryPage() {
     <main className="space-y-5">
       <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Compras</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">Selecciona un modo de compra</h1>
-        <p className="mt-1 text-sm text-slate-600">Mantiene carritos separados por categoria para no mezclar comida y casa.</p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">Compras del hogar</h1>
+        <p className="mt-1 text-sm text-slate-600">Comida y casa ahora comparten un carrito unificado para una sola compra final.</p>
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2">
@@ -22,6 +22,19 @@ export default function ShoppingEntryPage() {
           <h2 className="mt-1 text-lg font-semibold text-slate-900">Shopping de casa</h2>
           <p className="mt-1 text-sm text-slate-600">Reposicion de aseo casa, aseo personal y mejoras casa sin motor GPT.</p>
         </Link>
+      </section>
+
+      <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Carrito unico</p>
+            <h2 className="mt-1 text-lg font-semibold text-slate-900">Carrito del hogar</h2>
+            <p className="mt-1 text-sm text-slate-600">Puedes entrar desde comida o casa: veras el mismo carrito compartido.</p>
+          </div>
+          <Link href="/shopping/comida/cart" className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800">
+            Abrir carrito
+          </Link>
+        </div>
       </section>
     </main>
   );

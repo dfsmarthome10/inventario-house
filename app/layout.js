@@ -11,6 +11,7 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
   let cartBadgeCounts = {
+    household_lines: 0,
     comida_lines: 0,
     casa_lines: 0,
     total_lines: 0,
@@ -19,7 +20,7 @@ export default async function RootLayout({ children }) {
   try {
     cartBadgeCounts = await getOpenCartBadgeCounts();
   } catch (error) {
-    cartBadgeCounts = { comida_lines: 0, casa_lines: 0, total_lines: 0 };
+    cartBadgeCounts = { household_lines: 0, comida_lines: 0, casa_lines: 0, total_lines: 0 };
   }
 
   return (

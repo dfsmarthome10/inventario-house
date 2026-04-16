@@ -16,6 +16,14 @@ const ZONE_LABELS = {
 const SCOPE_LABELS = {
   comida: "Comida",
   casa: "Casa",
+  household: "Hogar (unificado)",
+};
+
+const CATEGORY_LABELS = {
+  comida: "Comida",
+  casa: "Casa",
+  gabinete: "Gabinete",
+  herramientas: "Herramientas",
 };
 
 function parseMonth(value) {
@@ -64,12 +72,13 @@ function monthLabel(month) {
 export default async function ShoppingHistoryCalendarPage({ searchParams }) {
   const month = parseMonth(typeof searchParams?.month === "string" ? searchParams.month : "");
   const scope = typeof searchParams?.scope === "string" ? searchParams.scope : "";
+  const categoria = typeof searchParams?.categoria === "string" ? searchParams.categoria : "";
   const selectedDate = typeof searchParams?.date === "string" ? searchParams.date : "";
   let calendarData = { receipts: [], days: [] };
   let setupError = "";
 
   try {
-    calendarData = await getPurchaseHistoryCalendar(month, { scope });
+    calendarData = await getPurchaseHistoryCalendar(month, { scope, categoria });
   } catch (error) {
     setupError = error instanceof Error ? error.message : "Calendar history is not ready.";
   }
@@ -141,7 +150,26 @@ export default async function ShoppingHistoryCalendarPage({ searchParams }) {
             Todos
           </Link>
           {Object.entries(SCOPE_LABELS).map(([key, label]) => (
-            <Link key={key} href={`/shopping/history/calendar?month=${month}&scope=${key}`} className={`rounded-full border px-3 py-1.5 text-xs font-medium ${scope === key ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 bg-white text-slate-700"}`}>
+            <Link
+              key={key}
+              href={`/shopping/history/calendar?month=${month}&scope=${key}${categoria ? `&categoria=${encodeURIComponent(categoria)}` : ""}`}
+              className={`rounded-full border px-3 py-1.5 text-xs font-medium ${scope === key ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 bg-white text-slate-700"}`}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Categoria</span>
+          <Link href={`/shopping/history/calendar?month=${month}${scope ? `&scope=${scope}` : ""}`} className={`rounded-full border px-3 py-1.5 text-xs font-medium ${!categoria ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 bg-white text-slate-700"}`}>
+            Todas
+          </Link>
+          {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
+            <Link
+              key={key}
+              href={`/shopping/history/calendar?month=${month}${scope ? `&scope=${scope}` : ""}&categoria=${encodeURIComponent(key)}`}
+              className={`rounded-full border px-3 py-1.5 text-xs font-medium ${categoria === key ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 bg-white text-slate-700"}`}
+            >
               {label}
             </Link>
           ))}
@@ -150,11 +178,11 @@ export default async function ShoppingHistoryCalendarPage({ searchParams }) {
 
       <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
-          <Link href={`/shopping/history/calendar?month=${prevMonth}${scope ? `&scope=${scope}` : ""}`} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          <Link href={`/shopping/history/calendar?month=${prevMonth}${scope ? `&scope=${scope}` : ""}${categoria ? `&categoria=${encodeURIComponent(categoria)}` : ""}`} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
             Mes anterior
           </Link>
           <h2 className="text-lg font-semibold capitalize text-slate-900">{monthLabel(month)}</h2>
-          <Link href={`/shopping/history/calendar?month=${nextMonth}${scope ? `&scope=${scope}` : ""}`} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          <Link href={`/shopping/history/calendar?month=${nextMonth}${scope ? `&scope=${scope}` : ""}${categoria ? `&categoria=${encodeURIComponent(categoria)}` : ""}`} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
             Mes siguiente
           </Link>
         </div>
@@ -179,7 +207,7 @@ export default async function ShoppingHistoryCalendarPage({ searchParams }) {
             return (
               <Link
                 key={dateKey}
-                href={`/shopping/history/calendar?month=${month}&date=${dateKey}${scope ? `&scope=${scope}` : ""}`}
+                href={`/shopping/history/calendar?month=${month}&date=${dateKey}${scope ? `&scope=${scope}` : ""}${categoria ? `&categoria=${encodeURIComponent(categoria)}` : ""}`}
                 className={`h-14 rounded-xl border px-2 py-1 text-left transition ${
                   active
                     ? "border-slate-900 bg-slate-900 text-white"
@@ -231,6 +259,11 @@ export default async function ShoppingHistoryCalendarPage({ searchParams }) {
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
+                  {Object.entries(selectedDaySummary.category_summary || {}).map(([categoryKey, category]) => (
+                    <span key={`category-${categoryKey}`} className="rounded-full border border-white bg-slate-900 px-2.5 py-1 text-xs font-medium text-white">
+                      {CATEGORY_LABELS[categoryKey] || categoryKey}: {category.units} u - {formatCurrency(category.amount)}
+                    </span>
+                  ))}
                   {Object.entries(selectedDaySummary.zone_summary || {}).map(([zoneKey, zone]) => (
                     <span key={zoneKey} className="rounded-full border border-white bg-white px-2.5 py-1 text-xs font-medium text-slate-700">
                       {ZONE_LABELS[zoneKey] || zoneKey}: {zone.units} u - {formatCurrency(zone.amount)}

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -87,15 +87,15 @@ function CartSelectorSheet({ open, onClose, counts }) {
       <section
         role="dialog"
         aria-modal="true"
-        aria-label="Selector de carritos"
+        aria-label="Selector de carrito"
         className={`absolute bottom-0 left-0 right-0 rounded-t-[2rem] border border-slate-200 bg-white p-4 shadow-2xl transition-transform duration-300 ${
           open ? "translate-y-0" : "translate-y-full"
         }`}
       >
         <div className="mb-3 flex items-start justify-between gap-2">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Carritos</p>
-            <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-900">Selecciona tu carrito</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Carrito</p>
+            <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-900">Carrito del hogar</h2>
           </div>
           <button type="button" onClick={onClose} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
             Cerrar
@@ -109,23 +109,15 @@ function CartSelectorSheet({ open, onClose, counts }) {
             className="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3"
           >
             <div>
-              <p className="text-sm font-semibold text-slate-900">Carrito · Comida</p>
-              <p className="text-xs text-slate-600">Items de lacena, nevera y congelador</p>
+              <p className="text-sm font-semibold text-slate-900">Carrito · Hogar</p>
+              <p className="text-xs text-slate-600">Compra combinada de comida y casa</p>
             </div>
-            <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-emerald-700">{counts.comida} lineas</span>
+            <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-emerald-700">{counts.total} lineas</span>
           </Link>
-
-          <Link
-            href="/shopping/casa/cart"
-            onClick={onClose}
-            className="flex items-center justify-between rounded-2xl border border-cyan-200 bg-cyan-50 px-3 py-3"
-          >
-            <div>
-              <p className="text-sm font-semibold text-slate-900">Carrito · Casa</p>
-              <p className="text-xs text-slate-600">Aseo casa, aseo personal y mejoras</p>
-            </div>
-            <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-cyan-700">{counts.casa} lineas</span>
-          </Link>
+          <div className="grid grid-cols-2 gap-2">
+            <span className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700">Comida: {counts.comida}</span>
+            <span className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700">Casa: {counts.casa}</span>
+          </div>
         </div>
       </section>
     </div>
@@ -145,7 +137,7 @@ export default function MobileBottomNav({ cartBadgeCounts }) {
   const counts = {
     comida: Number(cartBadgeCounts?.comida_lines || 0),
     casa: Number(cartBadgeCounts?.casa_lines || 0),
-    total: Number(cartBadgeCounts?.total_lines || 0),
+    total: Number(cartBadgeCounts?.household_lines || cartBadgeCounts?.total_lines || 0),
   };
 
   return (
@@ -189,3 +181,4 @@ export default function MobileBottomNav({ cartBadgeCounts }) {
     </>
   );
 }
+

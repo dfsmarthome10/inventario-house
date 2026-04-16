@@ -166,6 +166,9 @@ export default function ShoppingCartPanel({
               <div>
                 <p className="text-sm font-semibold text-slate-900">{line.item?.nombre || line.inventory_item_id}</p>
                 <p className="text-xs text-slate-500">{line.item?.alias || line.inventory_item_id}</p>
+                <p className="mt-1 text-[11px] text-slate-500">
+                  {(line.item?.categoria_principal || "sin-categoria").toString()} / {(line.item?.subcategoria || "sin-zona").toString()}
+                </p>
               </div>
               <p className="rounded-lg border border-white bg-white px-2 py-1 text-xs font-semibold text-slate-700">
                 {formatCurrency(line.ui_total)}

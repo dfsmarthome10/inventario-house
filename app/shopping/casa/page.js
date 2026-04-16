@@ -139,20 +139,20 @@ export default async function ShoppingCasaPage({ searchParams }) {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Modo compra</p>
             <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">Compras de casa</h1>
-            <p className="mt-1 text-sm text-slate-600">Gestiona reposicion de aseo y mejoras del hogar con confirmacion final.</p>
+            <p className="mt-1 text-sm text-slate-600">Gestiona reposicion de casa en el carrito unificado del hogar con confirmacion final.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href="/inventory/casa" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Volver al hub casa
             </Link>
-            <Link href="/shopping/history?scope=casa" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-              Historial casa
+            <Link href="/shopping/history" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+              Historial
             </Link>
             <Link href="/shopping/casa/cart" className="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
               Ver carrito
             </Link>
             <QuickCartDrawer
-              scopeLabel="Casa"
+              scopeLabel="Hogar"
               scopeTone="bg-cyan-100 text-cyan-700"
               lines={cart.lines}
               updateLineAction={updateCasaCartLineAction}
@@ -161,7 +161,7 @@ export default async function ShoppingCasaPage({ searchParams }) {
               fullCartHref="/shopping/casa/cart"
               continueHref="/shopping/casa"
             />
-            <span className="rounded-xl border border-cyan-200 bg-cyan-50 px-3 py-2 text-xs font-semibold text-cyan-700">Sesion {session.id}</span>
+            <span className="rounded-xl border border-cyan-200 bg-cyan-50 px-3 py-2 text-xs font-semibold text-cyan-700">Carrito hogar {session.id}</span>
           </div>
         </div>
       </section>
@@ -393,7 +393,7 @@ export default async function ShoppingCasaPage({ searchParams }) {
         </div>
 
         <ShoppingCartSummaryCard
-          scopeLabel="Casa"
+          scopeLabel="Hogar"
           scopeTone="bg-cyan-100 text-cyan-700"
           cart={cart}
           cartHref="/shopping/casa/cart"

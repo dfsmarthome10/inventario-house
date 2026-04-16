@@ -17,6 +17,14 @@ const ZONE_LABELS = {
 const SCOPE_LABELS = {
   comida: "Comida",
   casa: "Casa",
+  household: "Hogar (comida + casa)",
+};
+
+const CATEGORY_LABELS = {
+  comida: "Comida",
+  casa: "Casa",
+  gabinete: "Gabinete",
+  herramientas: "Herramientas",
 };
 
 export default async function ShoppingReceiptPage({ params }) {
@@ -102,6 +110,7 @@ export default async function ShoppingReceiptPage({ params }) {
             <thead className="text-xs uppercase tracking-wide text-slate-500">
               <tr>
                 <th className="px-4 pb-2 pt-3 pr-4">Item</th>
+                <th className="px-4 pb-2 pt-3 pr-4">Categoria</th>
                 <th className="px-4 pb-2 pt-3 pr-4">Zona</th>
                 <th className="px-4 pb-2 pt-3 pr-4">Cantidad</th>
                 <th className="px-4 pb-2 pt-3 pr-4">Precio</th>
@@ -117,6 +126,7 @@ export default async function ShoppingReceiptPage({ params }) {
                     <p className="font-medium text-slate-900">{line.item_nombre}</p>
                     <p className="text-xs text-slate-500">{line.item_alias}</p>
                   </td>
+                  <td className="px-4 py-3 pr-4 text-slate-700">{CATEGORY_LABELS[line.categoria_principal] || line.categoria_principal || "-"}</td>
                   <td className="px-4 py-3 pr-4 text-slate-700">{ZONE_LABELS[line.subcategoria] || line.subcategoria || "-"}</td>
                   <td className="px-4 py-3 pr-4 text-slate-700">{line.quantity_purchased}</td>
                   <td className="px-4 py-3 pr-4 text-slate-700">{formatCurrency(line.purchase_price)}</td>
@@ -133,14 +143,14 @@ export default async function ShoppingReceiptPage({ params }) {
       </section>
 
       <section className="flex flex-wrap gap-2">
-        <Link href={receipt.scope === "casa" ? "/shopping/casa" : "/shopping/comida"} className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">
+        <Link href="/shopping" className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">
           Nueva compra
         </Link>
         <Link href="/shopping/history" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
           Ver historial
         </Link>
-        <Link href={receipt.scope === "casa" ? "/inventory/casa" : "/inventory/comida"} className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
-          Volver al hub
+        <Link href="/inventory" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          Volver a inventario
         </Link>
       </section>
     </main>

@@ -158,12 +158,13 @@ export async function confirmPurchaseAction() {
   const session = await getOrCreateOpenFoodSession();
   const { receiptId, touchedItemIds } = await confirmFoodPurchase(session.id);
   const allItems = await getAllItems();
-  const lowStockItems = allItems.filter((item) => item.categoria_principal === "comida" && isLowStock(item));
+  const lowStockItems = allItems.filter((item) => ["comida", "casa"].includes(item.categoria_principal) && isLowStock(item));
 
   await sendHomeAssistantEvent("purchase_confirmed", {
     receipt_id: receiptId,
     session_id: session.id,
     touched_item_ids: touchedItemIds,
+    scope: "household",
     low_stock_count: lowStockItems.length,
   });
 

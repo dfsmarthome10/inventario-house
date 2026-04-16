@@ -115,13 +115,13 @@ export default async function ShoppingFoodPage({ searchParams }) {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Modo compra</p>
             <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">Compras de comida</h1>
-            <p className="mt-1 text-sm text-slate-600">Agrega lineas al carrito y confirma al final para actualizar inventario.</p>
+            <p className="mt-1 text-sm text-slate-600">Agrega comida al carrito unificado del hogar y confirma al final para actualizar inventario.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href="/inventory/comida" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Volver al food hub
             </Link>
-            <Link href="/shopping/history?scope=comida" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            <Link href="/shopping/history" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Historial
             </Link>
             <Link href="/shopping/casa" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
@@ -134,7 +134,7 @@ export default async function ShoppingFoodPage({ searchParams }) {
               Ver carrito
             </Link>
             <QuickCartDrawer
-              scopeLabel="Comida"
+              scopeLabel="Hogar"
               scopeTone="bg-emerald-100 text-emerald-700"
               lines={cart.lines}
               updateLineAction={updateCartLineAction}
@@ -144,7 +144,7 @@ export default async function ShoppingFoodPage({ searchParams }) {
               continueHref="/shopping/comida"
             />
             <span className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700">
-              Sesion {session.id}
+              Carrito hogar {session.id}
             </span>
           </div>
         </div>
@@ -325,7 +325,7 @@ export default async function ShoppingFoodPage({ searchParams }) {
         </div>
 
         <ShoppingCartSummaryCard
-          scopeLabel="Comida"
+          scopeLabel="Hogar"
           scopeTone="bg-emerald-100 text-emerald-700"
           cart={cart}
           cartHref="/shopping/comida/cart"

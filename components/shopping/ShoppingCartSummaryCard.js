@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { formatCurrency } from "@/lib/formatters";
 
 function getTotals(cart) {
@@ -25,7 +25,7 @@ export default function ShoppingCartSummaryCard({
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Resumen rapido</p>
-          <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-900">Carrito · {scopeLabel}</h2>
+          <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-900">Carrito - {scopeLabel}</h2>
         </div>
         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${scopeTone}`}>{totals.lines} lineas</span>
       </div>
@@ -54,8 +54,9 @@ export default function ShoppingCartSummaryCard({
           previewLines.map((line) => (
             <div key={line.id} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
               <p className="font-medium text-slate-900">{line.item?.nombre || line.inventory_item_id}</p>
-              <p className="text-xs text-slate-500">
-                x{line.quantity_to_buy} · {formatCurrency(line.line_total)}
+              <p className="text-xs text-slate-500">x{line.quantity_to_buy} - {formatCurrency(line.line_total)}</p>
+              <p className="text-[11px] text-slate-500">
+                {(line.item?.categoria_principal || "sin-categoria").toString()} / {(line.item?.subcategoria || "sin-zona").toString()}
               </p>
             </div>
           ))
@@ -75,3 +76,4 @@ export default function ShoppingCartSummaryCard({
     </section>
   );
 }
+
