@@ -6,6 +6,7 @@ Last updated: 2026-04-16
 - `comida`
 - `casa`
 - `gabinete`
+- `herramientas`
 
 These are the active product pillars in UX, navigation, and daily usage.
 
@@ -33,6 +34,11 @@ These are the active product pillars in UX, navigation, and daily usage.
   - `gavetero_3`
   - `gavetero_4` (reserved/pending)
 - Supports direct items, thematic containers, sub-boxes, and logical systems.
+
+### Herramientas
+- Logical category for tools and related tool systems.
+- Tools are categorized by **what they are**, not only by storage drawer.
+- Physical placement is kept in `ubicacion` (example: `Cueva`).
 
 ## Established Modeling Rules (Do Not Break)
 - `Cueva` is a **physical location** (`ubicacion`), not a top-level category.

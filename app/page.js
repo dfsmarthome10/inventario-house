@@ -22,6 +22,14 @@ const PRIMARY_CATEGORY_CARDS = [
     badgeTone: "bg-cyan-100 text-cyan-700",
   },
   {
+    key: "herramientas",
+    title: "Herramientas",
+    description: "Herramientas logicas con ubicacion fisica preservada.",
+    href: "/inventory/herramientas",
+    tone: "border-sky-200 bg-sky-50",
+    badgeTone: "bg-sky-100 text-sky-700",
+  },
+  {
     key: "gabinete",
     title: "Gabinete",
     description: "Gaveteros, contenedores y sistemas del taller.",
@@ -54,7 +62,7 @@ export default async function HomePage() {
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Inicio</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">Dashboard del hogar</h1>
         <p className="mt-1 text-sm text-slate-600">
-          Vista clara para entrar rapido a comida, casa y gabinete sin sobrecargar la pantalla.
+          Vista clara para entrar rapido a comida, casa, gabinete y herramientas sin sobrecargar la pantalla.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link href="/shopping" className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
@@ -69,7 +77,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="grid gap-3 lg:grid-cols-3">
+      <section className="grid gap-3 lg:grid-cols-4">
         {PRIMARY_CATEGORY_CARDS.map((card) => (
           <Link
             key={card.key}

@@ -6,7 +6,7 @@ import { getAllItems } from "@/lib/inventoryRepository";
 
 export const dynamic = "force-dynamic";
 
-const PRIMARY_CATEGORIES = ["comida", "casa", "gabinete"];
+const PRIMARY_CATEGORIES = ["comida", "casa", "gabinete", "herramientas"];
 
 const CATEGORY_HUB_META = {
   comida: {
@@ -29,6 +29,13 @@ const CATEGORY_HUB_META = {
     description: "Gaveteros, zonas y contenedores del taller.",
     tone: "border-violet-200 bg-violet-50",
     badge: "bg-violet-100 text-violet-700",
+  },
+  herramientas: {
+    title: "Herramientas",
+    href: "/inventory/herramientas",
+    description: "Categoria logica de herramientas, sin depender del gavetero.",
+    tone: "border-sky-200 bg-sky-50",
+    badge: "bg-sky-100 text-sky-700",
   },
 };
 
@@ -53,7 +60,7 @@ export default async function InventoryPage({ searchParams }) {
         <p className="mt-1 text-sm text-slate-600">Explora por categoria principal o usa filtros para buscar rapido lo que necesitas.</p>
       </section>
 
-      <section className="grid gap-3 lg:grid-cols-3">
+      <section className="grid gap-3 lg:grid-cols-4">
         {PRIMARY_CATEGORIES.map((key) => {
           const meta = CATEGORY_HUB_META[key];
           return (
