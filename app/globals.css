@@ -6,15 +6,31 @@
   color-scheme: light;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow-x: clip;
+}
+
 body {
   @apply min-h-screen bg-slate-100 text-ink antialiased;
   background-image: radial-gradient(circle at 100% 0%, #e0f2fe 0%, rgba(224, 242, 254, 0) 34%),
     radial-gradient(circle at 0% 100%, #f1f5f9 0%, rgba(241, 245, 249, 0) 44%);
+  overflow-x: clip;
+  overscroll-behavior-y: contain;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 a,
 button {
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2;
+  touch-action: manipulation;
+}
+
+input,
+select,
+textarea {
+  min-width: 0;
 }
 
 @layer components {
@@ -80,5 +96,43 @@ button {
 
   .ios-home-pill-active {
     @apply bg-slate-900 text-white;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .ios-bottom-nav {
+    padding-left: 18px;
+    padding-right: 18px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .ios-bottom-shell {
+    max-width: 44rem;
+    padding: 0.62rem 0.75rem;
+    border-radius: 2.2rem;
+  }
+
+  .ios-bottom-tab {
+    font-size: 0.72rem;
+    gap: 0.32rem;
+  }
+
+  .ios-bottom-tab svg {
+    width: 1.28rem;
+    height: 1.28rem;
+  }
+
+  .ios-home-pill {
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-top: -2.05rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
   }
 }

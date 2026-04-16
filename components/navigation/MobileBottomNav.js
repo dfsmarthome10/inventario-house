@@ -88,7 +88,7 @@ function CartSelectorSheet({ open, onClose, counts }) {
         role="dialog"
         aria-modal="true"
         aria-label="Selector de carrito"
-        className={`absolute bottom-0 left-0 right-0 rounded-t-[2rem] border border-slate-200 bg-white p-4 shadow-2xl transition-transform duration-300 ${
+        className={`absolute bottom-0 left-0 right-0 rounded-t-[2rem] border border-slate-200 bg-white p-4 shadow-2xl transition-transform duration-300 md:left-1/2 md:right-auto md:w-[min(92vw,44rem)] md:-translate-x-1/2 ${
           open ? "translate-y-0" : "translate-y-full"
         }`}
       >
@@ -142,7 +142,7 @@ export default function MobileBottomNav({ cartBadgeCounts }) {
 
   return (
     <>
-      <div className="ios-bottom-nav md:hidden">
+      <div className="ios-bottom-nav lg:hidden">
         <div className="ios-bottom-shell">
           <Link href="/shopping" className={`ios-bottom-tab ${shoppingActive ? "ios-bottom-tab-active" : ""}`}>
             <TabIcon type="shopping" active={shoppingActive} />

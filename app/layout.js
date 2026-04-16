@@ -7,6 +7,22 @@ import { getOpenCartBadgeCounts } from "@/lib/shoppingRepository";
 export const metadata = {
   title: "Inventory House NFC",
   description: "Sistema de inventario del hogar basado en NFC",
+  applicationName: "Inventory House",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Inventory House",
+  },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#f1f5f9",
 };
 
 export default async function RootLayout({ children }) {
@@ -26,7 +42,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="es">
       <body>
-        <div className="mx-auto min-h-screen w-full max-w-5xl px-4 pb-28 pt-4 sm:px-6 md:pb-10 lg:px-8">
+        <div className="mx-auto min-h-screen w-full max-w-5xl px-4 pb-[calc(7.25rem+env(safe-area-inset-bottom))] pt-4 sm:px-6 lg:px-8 lg:pb-10">
           <header className="mb-6 rounded-3xl border border-slate-200 bg-white/95 p-5 shadow-sm backdrop-blur">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -36,7 +52,7 @@ export default async function RootLayout({ children }) {
                 <p className="mt-1 px-2 text-sm text-slate-600">Inventario NFC del hogar con estructura premium para despliegue.</p>
               </div>
               <MobileTopMenu />
-              <nav className="hidden flex-wrap items-center gap-2 md:flex">
+              <nav className="hidden flex-wrap items-center gap-2 lg:flex">
                 <Link href="/" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Inicio</Link>
                 <Link href="/inventory" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Inventario</Link>
                 <Link href="/inventory/herramientas" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Herramientas</Link>
