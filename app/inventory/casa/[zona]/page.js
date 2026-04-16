@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import FoodFilterBar from "@/components/inventory/FoodFilterBar";
 import InventoryItemCard from "@/components/inventory/InventoryItemCard";
+import { HouseLaneChip, HouseLaneSectionHeader } from "@/components/house/HouseLaneUI";
 import { applyInventoryFilters, getStockPriority, isLowStock } from "@/lib/inventoryFilters";
 import { getAllItems } from "@/lib/inventoryRepository";
 import { getHouseSubcategoryLabel, HOUSE_ZONE_KEY_TO_SLUG, HOUSE_ZONE_SLUG_TO_KEY } from "@/lib/house";
@@ -55,6 +56,7 @@ export default async function CasaZonePage({ params, searchParams }) {
     ? filteredBase.filter((item) => typeof item.cantidad_actual === "number" && item.cantidad_actual >= 1)
     : filteredBase;
   const groupedByLane = groupHouseItemsByLane(filtered);
+  const laneOverview = groupHouseItemsByLane(zoneItems);
   const lowStockCount = zoneItems.filter((item) => isLowStock(item)).length;
   const criticalCount = zoneItems.filter((item) => getStockPriority(item) === "critical").length;
   const mediumCount = zoneItems.filter((item) => getStockPriority(item) === "medium").length;
@@ -123,6 +125,26 @@ export default async function CasaZonePage({ params, searchParams }) {
 
       <FoodFilterBar searchParams={searchParams || {}} clearHref={availableOnly ? `/inventory/casa/${zoneSlug}?available_only=1` : `/inventory/casa/${zoneSlug}`} />
 
+      <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Pasillos de zona</p>
+          <span className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700">
+            {zoneItems.length} items en {getHouseSubcategoryLabel(zone)}
+          </span>
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {laneOverview.map((lane) => (
+            <HouseLaneChip
+              key={`${zone}-${lane.laneKey}`}
+              laneKey={lane.laneKey}
+              label={lane.laneLabel}
+              count={lane.items.length}
+              href={`/inventory/casa/${zoneSlug}${buildQuery(searchParams, { search: null, low_stock: null, available_only: availableOnly ? "1" : null })}`}
+            />
+          ))}
+        </div>
+      </section>
+
       <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-900">Showroom de {getHouseSubcategoryLabel(zone)}</h2>
@@ -137,15 +159,12 @@ export default async function CasaZonePage({ params, searchParams }) {
           <div className="space-y-4">
             {groupedByLane.map((laneGroup) => (
               <section key={laneGroup.laneKey} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                <div className="mb-3 flex items-center justify-between gap-2">
-                  <div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-700">{laneGroup.laneLabel}</h3>
-                    <p className="text-xs text-slate-500">{laneGroup.laneDescription}</p>
-                  </div>
-                  <span className="rounded-full border border-white bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700">
-                    {laneGroup.items.length}
-                  </span>
-                </div>
+                <HouseLaneSectionHeader
+                  laneKey={laneGroup.laneKey}
+                  title={laneGroup.laneLabel}
+                  description={laneGroup.laneDescription}
+                  count={laneGroup.items.length}
+                />
                 <div className="grid gap-3 sm:grid-cols-2">
                   {laneGroup.items.map((item) => (
                     <InventoryItemCard key={item.id} item={item} variant="showroom" />

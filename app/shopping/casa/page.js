@@ -2,6 +2,7 @@ import Link from "next/link";
 import ShoppingCartSummaryCard from "@/components/shopping/ShoppingCartSummaryCard";
 import QuickCartDrawer from "@/components/shopping/QuickCartDrawer";
 import ThumbnailImage from "@/components/common/ThumbnailImage";
+import { HouseLaneChip, HouseLaneSectionHeader } from "@/components/house/HouseLaneUI";
 import { getOrCreateOpenHouseSession, getHouseCatalog, getSessionCart } from "@/lib/shoppingRepository";
 import { getHouseSubcategoryLabel, HOUSE_SUBCATEGORIES } from "@/lib/house";
 import { groupHouseItemsByLane, getHouseShoppingLaneKey, getHouseShoppingLaneLabel, HOUSE_LANE_META } from "@/lib/houseShoppingLanes";
@@ -23,6 +24,24 @@ function buildClearHref(searchParams = {}) {
     return `/shopping/casa?subcategoria=${encodeURIComponent(zone)}`;
   }
   return "/shopping/casa";
+}
+
+function buildLaneHref(searchParams = {}, laneKey = "") {
+  const params = new URLSearchParams();
+  if (typeof searchParams.search === "string" && searchParams.search.trim()) {
+    params.set("search", searchParams.search.trim());
+  }
+  if (typeof searchParams.subcategoria === "string" && searchParams.subcategoria.trim()) {
+    params.set("subcategoria", searchParams.subcategoria.trim());
+  }
+  if (searchParams.low_stock === "1") {
+    params.set("low_stock", "1");
+  }
+  if (laneKey) {
+    params.set("lane", laneKey);
+  }
+  const query = params.toString();
+  return query ? `/shopping/casa?${query}` : "/shopping/casa";
 }
 
 function getSelectedLane(searchParams = {}) {
@@ -93,6 +112,7 @@ export default async function ShoppingCasaPage({ searchParams }) {
     ? catalog.filter((item) => getHouseShoppingLaneKey(item) === selectedLane)
     : catalog;
   const groupedCatalog = groupHouseItemsByLane(catalogLaneFiltered);
+  const laneOverview = groupHouseItemsByLane(catalog);
 
   if (setupError) {
     return (
@@ -147,6 +167,33 @@ export default async function ShoppingCasaPage({ searchParams }) {
       </section>
 
       <ShoppingStatusBanner searchParams={searchParams || {}} />
+
+      <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Pasillos de compra</p>
+            <h2 className="text-lg font-semibold tracking-tight text-slate-900">
+              {selectedLane ? `Carrito rapido por ${HOUSE_LANE_META[selectedLane]?.label || "pasillo"}` : "Exploracion tipo tienda"}
+            </h2>
+          </div>
+          <span className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700">
+            {catalogLaneFiltered.length} items visibles
+          </span>
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          <HouseLaneChip laneKey="all" label="Todos" count={catalog.length} href={buildLaneHref(searchParams || {}, "")} active={!selectedLane} />
+          {laneOverview.map((lane) => (
+            <HouseLaneChip
+              key={lane.laneKey}
+              laneKey={lane.laneKey}
+              label={lane.laneLabel}
+              count={lane.items.length}
+              href={buildLaneHref(searchParams || {}, lane.laneKey)}
+              active={selectedLane === lane.laneKey}
+            />
+          ))}
+        </div>
+      </section>
 
       <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
         <form method="get" className="grid gap-3 sm:grid-cols-4 sm:items-end">
@@ -277,18 +324,15 @@ export default async function ShoppingCasaPage({ searchParams }) {
             <div className="space-y-3">
               {groupedCatalog.map((laneGroup) => (
                 <section key={laneGroup.laneKey} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-700">{laneGroup.laneLabel}</h3>
-                      <p className="text-xs text-slate-500">{laneGroup.laneDescription}</p>
-                    </div>
-                    <span className="rounded-full border border-white bg-white px-2.5 py-1 text-xs font-semibold text-slate-700">
-                      {laneGroup.items.length}
-                    </span>
-                  </div>
+                  <HouseLaneSectionHeader
+                    laneKey={laneGroup.laneKey}
+                    title={laneGroup.laneLabel}
+                    description={laneGroup.laneDescription}
+                    count={laneGroup.items.length}
+                  />
                   <div className="space-y-3">
                     {laneGroup.items.map((item) => (
-                      <article key={item.id} className="rounded-2xl border border-slate-200 bg-white p-3">
+                      <article key={item.id} className="rounded-3xl border border-slate-200 bg-white p-3 shadow-sm transition hover:-translate-y-px hover:shadow-md">
                         <div className="flex gap-3">
                           <div className="w-28 shrink-0">
                             <ThumbnailImage

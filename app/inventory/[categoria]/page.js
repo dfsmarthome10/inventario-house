@@ -3,6 +3,7 @@ import Link from "next/link";
 import InventoryItemCard from "@/components/inventory/InventoryItemCard";
 import InventoryFilterBar from "@/components/inventory/InventoryFilterBar";
 import FoodFilterBar from "@/components/inventory/FoodFilterBar";
+import { HouseLaneChip } from "@/components/house/HouseLaneUI";
 import FoodZonePills from "@/components/inventory/FoodZonePills";
 import FoodAvailabilitySection from "@/components/inventory/FoodAvailabilitySection";
 import FoodHubQuickControls from "@/components/inventory/FoodHubQuickControls";
@@ -184,6 +185,7 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
     ? houseFilteredBase.filter((item) => typeof item.cantidad_actual === "number" && item.cantidad_actual >= 1)
     : houseFilteredBase;
   const houseZonesToRender = HOUSE_SUBCATEGORIES.includes(zoneFilter) ? [zoneFilter] : HOUSE_SUBCATEGORIES;
+  const houseLaneOverview = groupHouseItemsByLane(houseFiltered);
 
   const gabineteFilteredBase = filtered.filter((item) => item.categoria_principal === "gabinete");
   const gabineteAll = items.filter((item) => item.categoria_principal === "gabinete");
@@ -339,11 +341,35 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
 
             <FoodFilterBar searchParams={searchParams || {}} clearHref={availableOnly ? "/inventory/casa?available_only=1" : "/inventory/casa"} />
 
+            <section className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Vista por pasillos</p>
+                  <h3 className="text-base font-semibold tracking-tight text-slate-900">Recorrido tipo retail</h3>
+                </div>
+                <Link href="/shopping/casa" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+                  Abrir modo compra
+                </Link>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {houseLaneOverview.map((lane) => (
+                  <HouseLaneChip
+                    key={lane.laneKey}
+                    laneKey={lane.laneKey}
+                    label={lane.laneLabel}
+                    count={lane.items.length}
+                    href={`/shopping/casa?lane=${encodeURIComponent(lane.laneKey)}`}
+                  />
+                ))}
+              </div>
+            </section>
+
             {houseZonesToRender.map((sub) => {
               const zoneItems = houseFiltered.filter((item) => item.subcategoria === sub);
               const sortedZoneItems = sortHouseItemsForShopping(zoneItems);
               const preview = sortedZoneItems.slice(0, 6);
               const laneSummary = groupHouseItemsByLane(zoneItems).map((lane) => ({
+                laneKey: lane.laneKey,
                 label: lane.laneLabel,
                 count: lane.items.length,
               }));
@@ -379,9 +405,13 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
                   {laneSummary.length > 0 ? (
                     <div className="mb-3 flex flex-wrap items-center gap-1.5">
                       {laneSummary.map((lane) => (
-                        <span key={`${sub}-${lane.label}`} className="rounded-full border border-slate-200 bg-white px-2 py-1 text-[11px] font-medium text-slate-600">
-                          {lane.label}: {lane.count}
-                        </span>
+                        <HouseLaneChip
+                          key={`${sub}-${lane.laneKey}`}
+                          laneKey={lane.laneKey}
+                          label={lane.label}
+                          count={lane.count}
+                          href={`/shopping/casa?subcategoria=${encodeURIComponent(sub)}&lane=${encodeURIComponent(lane.laneKey)}`}
+                        />
                       ))}
                     </div>
                   ) : null}
