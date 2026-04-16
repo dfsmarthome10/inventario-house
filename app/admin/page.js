@@ -73,7 +73,7 @@ function buildFilters(searchParams) {
 
 function itemMatchesFilters(item, filters) {
   if (filters.search) {
-    const haystack = `${item.id} ${item.alias} ${item.nombre}`.toLowerCase();
+    const haystack = `${item.id} ${item.alias} ${item.nombre} ${item.ubicacion || ""}`.toLowerCase();
     if (!haystack.includes(filters.search)) {
       return false;
     }
