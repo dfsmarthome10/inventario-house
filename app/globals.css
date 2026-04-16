@@ -19,12 +19,14 @@ body {
   overflow-x: clip;
   overscroll-behavior-y: contain;
   padding-bottom: env(safe-area-inset-bottom);
+  -webkit-overflow-scrolling: touch;
 }
 
 a,
 button {
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2;
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 input,
@@ -34,6 +36,10 @@ textarea {
 }
 
 @layer components {
+  .app-shell {
+    max-width: 80rem;
+  }
+
   .pb-app-shell {
     padding-bottom: calc(7.25rem + env(safe-area-inset-bottom));
   }
@@ -144,6 +150,51 @@ textarea {
     width: 3.5rem;
     height: 3.5rem;
     margin-top: -2.05rem;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1500px) and (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .app-shell {
+    max-width: min(96vw, 82rem);
+    padding-left: 1.1rem;
+    padding-right: 1.1rem;
+  }
+
+  .pb-app-shell {
+    padding-bottom: calc(8.1rem + env(safe-area-inset-bottom));
+  }
+
+  .ios-bottom-nav {
+    padding-left: 18px;
+    padding-right: 18px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .ios-bottom-shell {
+    max-width: min(94vw, 58rem);
+    border-radius: 2.3rem;
+    padding: 0.72rem 0.9rem;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .ios-bottom-tab {
+    font-size: 0.78rem;
+    gap: 0.36rem;
+  }
+
+  .ios-bottom-tab svg {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .ios-home-pill {
+    width: 3.7rem;
+    height: 3.7rem;
+    margin-top: -2.15rem;
+  }
+
+  .ios-top-menu-panel {
+    width: 18.5rem;
   }
 }
 
