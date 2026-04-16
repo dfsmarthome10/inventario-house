@@ -22,6 +22,10 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+body.pwa-standalone {
+  min-height: 100dvh;
+}
+
 a,
 button {
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2;
@@ -203,5 +207,15 @@ textarea {
   select,
   textarea {
     font-size: 16px;
+  }
+}
+
+@media (display-mode: standalone) {
+  .app-shell {
+    padding-top: calc(env(safe-area-inset-top) + 0.65rem);
+  }
+
+  .ios-bottom-nav {
+    z-index: 60;
   }
 }

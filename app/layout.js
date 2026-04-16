@@ -2,6 +2,7 @@ import "./globals.css";
 import Link from "next/link";
 import MobileBottomNav from "@/components/navigation/MobileBottomNav";
 import MobileTopMenu from "@/components/navigation/MobileTopMenu";
+import PWAClientSetup from "@/components/pwa/PWAClientSetup";
 import { getOpenCartBadgeCounts } from "@/lib/shoppingRepository";
 
 export const metadata = {
@@ -11,8 +12,21 @@ export const metadata = {
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "Inventory House",
+  },
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.svg", type: "image/svg+xml", sizes: "192x192" },
+      { url: "/icons/icon-512.svg", type: "image/svg+xml", sizes: "512x512" },
+    ],
+    apple: [{ url: "/icons/icon-192.svg", type: "image/svg+xml" }],
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "format-detection": "telephone=no",
   },
 };
 
@@ -23,6 +37,7 @@ export const viewport = {
   userScalable: false,
   viewportFit: "cover",
   themeColor: "#f1f5f9",
+  interactiveWidget: "resizes-content",
 };
 
 export default async function RootLayout({ children }) {
@@ -42,6 +57,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="es">
       <body>
+        <PWAClientSetup />
         <div className="app-shell pb-app-shell mx-auto min-h-screen w-full px-4 pt-4 sm:px-6 lg:px-8">
           <header className="mb-6 rounded-3xl border border-slate-200 bg-white/95 p-5 shadow-sm backdrop-blur">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
