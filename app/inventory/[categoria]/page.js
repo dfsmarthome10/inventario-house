@@ -9,6 +9,7 @@ import FoodHubQuickControls from "@/components/inventory/FoodHubQuickControls";
 import { FOOD_SUBCATEGORIES, HOUSE_SUBCATEGORIES, applyInventoryFilters, getCategoryOptionsFromItems, getStockPriority, isLowStock } from "@/lib/inventoryFilters";
 import { getAllItems } from "@/lib/inventoryRepository";
 import { getHouseSubcategoryLabel, HOUSE_ZONE_KEY_TO_SLUG } from "@/lib/house";
+import { groupHouseItemsByLane, sortHouseItemsForShopping } from "@/lib/houseShoppingLanes";
 import { GABINETE_SUBCATEGORIES, GABINETE_ZONE_KEY_TO_SLUG, getGabineteSubcategoryLabel } from "@/lib/gabinete";
 
 export const dynamic = "force-dynamic";
@@ -340,7 +341,12 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
 
             {houseZonesToRender.map((sub) => {
               const zoneItems = houseFiltered.filter((item) => item.subcategoria === sub);
-              const preview = zoneItems.slice(0, 6);
+              const sortedZoneItems = sortHouseItemsForShopping(zoneItems);
+              const preview = sortedZoneItems.slice(0, 6);
+              const laneSummary = groupHouseItemsByLane(zoneItems).map((lane) => ({
+                label: lane.laneLabel,
+                count: lane.items.length,
+              }));
               const lowStock = zoneItems.filter((item) => isLowStock(item)).length;
               const critical = zoneItems.filter((item) => getStockPriority(item) === "critical").length;
               const slug = HOUSE_ZONE_KEY_TO_SLUG[sub];
@@ -370,6 +376,15 @@ export default async function InventoryCategoryPage({ params, searchParams }) {
                     </div>
                   </div>
                   <p className="mb-3 text-xs text-slate-600">{HOUSE_META[sub]?.description}</p>
+                  {laneSummary.length > 0 ? (
+                    <div className="mb-3 flex flex-wrap items-center gap-1.5">
+                      {laneSummary.map((lane) => (
+                        <span key={`${sub}-${lane.label}`} className="rounded-full border border-slate-200 bg-white px-2 py-1 text-[11px] font-medium text-slate-600">
+                          {lane.label}: {lane.count}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
                   {zoneItems.length === 0 ? (
                     <p className="text-sm text-slate-500">Sin items en esta subcategoria.</p>
                   ) : (

@@ -5,6 +5,7 @@ import InventoryItemCard from "@/components/inventory/InventoryItemCard";
 import { applyInventoryFilters, getStockPriority, isLowStock } from "@/lib/inventoryFilters";
 import { getAllItems } from "@/lib/inventoryRepository";
 import { getHouseSubcategoryLabel, HOUSE_ZONE_KEY_TO_SLUG, HOUSE_ZONE_SLUG_TO_KEY } from "@/lib/house";
+import { groupHouseItemsByLane } from "@/lib/houseShoppingLanes";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +54,7 @@ export default async function CasaZonePage({ params, searchParams }) {
   const filtered = availableOnly
     ? filteredBase.filter((item) => typeof item.cantidad_actual === "number" && item.cantidad_actual >= 1)
     : filteredBase;
+  const groupedByLane = groupHouseItemsByLane(filtered);
   const lowStockCount = zoneItems.filter((item) => isLowStock(item)).length;
   const criticalCount = zoneItems.filter((item) => getStockPriority(item) === "critical").length;
   const mediumCount = zoneItems.filter((item) => getStockPriority(item) === "medium").length;
@@ -132,9 +134,24 @@ export default async function CasaZonePage({ params, searchParams }) {
             <p className="mt-1 text-sm text-slate-500">Limpia filtros o cambia de subcategoria.</p>
           </div>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {filtered.map((item) => (
-              <InventoryItemCard key={item.id} item={item} variant="showroom" />
+          <div className="space-y-4">
+            {groupedByLane.map((laneGroup) => (
+              <section key={laneGroup.laneKey} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-700">{laneGroup.laneLabel}</h3>
+                    <p className="text-xs text-slate-500">{laneGroup.laneDescription}</p>
+                  </div>
+                  <span className="rounded-full border border-white bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700">
+                    {laneGroup.items.length}
+                  </span>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {laneGroup.items.map((item) => (
+                    <InventoryItemCard key={item.id} item={item} variant="showroom" />
+                  ))}
+                </div>
+              </section>
             ))}
           </div>
         )}

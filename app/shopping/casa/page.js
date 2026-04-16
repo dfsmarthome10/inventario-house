@@ -4,6 +4,7 @@ import QuickCartDrawer from "@/components/shopping/QuickCartDrawer";
 import ThumbnailImage from "@/components/common/ThumbnailImage";
 import { getOrCreateOpenHouseSession, getHouseCatalog, getSessionCart } from "@/lib/shoppingRepository";
 import { getHouseSubcategoryLabel, HOUSE_SUBCATEGORIES } from "@/lib/house";
+import { groupHouseItemsByLane, getHouseShoppingLaneKey, getHouseShoppingLaneLabel, HOUSE_LANE_META } from "@/lib/houseShoppingLanes";
 import { addToCasaCartAction, confirmCasaPurchaseAction, createHouseItemFromShoppingAction, removeCasaCartLineAction, updateCasaCartLineAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +23,11 @@ function buildClearHref(searchParams = {}) {
     return `/shopping/casa?subcategoria=${encodeURIComponent(zone)}`;
   }
   return "/shopping/casa";
+}
+
+function getSelectedLane(searchParams = {}) {
+  const lane = typeof searchParams.lane === "string" ? searchParams.lane : "";
+  return Object.prototype.hasOwnProperty.call(HOUSE_LANE_META, lane) ? lane : "";
 }
 
 function ShoppingStatusBanner({ searchParams }) {
@@ -81,6 +87,12 @@ export default async function ShoppingCasaPage({ searchParams }) {
   } catch (error) {
     setupError = error instanceof Error ? error.message : "Shopping mode is not ready.";
   }
+
+  const selectedLane = getSelectedLane(searchParams || {});
+  const catalogLaneFiltered = selectedLane
+    ? catalog.filter((item) => getHouseShoppingLaneKey(item) === selectedLane)
+    : catalog;
+  const groupedCatalog = groupHouseItemsByLane(catalogLaneFiltered);
 
   if (setupError) {
     return (
@@ -163,6 +175,18 @@ export default async function ShoppingCasaPage({ searchParams }) {
             <span className="text-sm text-slate-700">Solo stock bajo</span>
           </label>
 
+          <label className="flex flex-col gap-1">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Pasillo</span>
+            <select name="lane" defaultValue={selectedLane} className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900">
+              <option value="">Todos</option>
+              {Object.entries(HOUSE_LANE_META).map(([laneKey, meta]) => (
+                <option key={laneKey} value={laneKey}>
+                  {meta.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
           <div className="flex gap-2 sm:col-span-4">
             <button type="submit" className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">
               Aplicar filtros
@@ -239,68 +263,86 @@ export default async function ShoppingCasaPage({ searchParams }) {
 
       <section className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold tracking-tight text-slate-900">Catalogo de casa</h2>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">{catalog.length} items</span>
-          </div>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold tracking-tight text-slate-900">Catalogo de casa</h2>
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">{catalogLaneFiltered.length} items</span>
+        </div>
 
-          {catalog.length === 0 ? (
+          {catalogLaneFiltered.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5 text-center">
               <p className="text-sm font-medium text-slate-700">No hay items para esos filtros.</p>
-              <p className="mt-1 text-sm text-slate-500">Ajusta la busqueda o subcategoria.</p>
+              <p className="mt-1 text-sm text-slate-500">Ajusta busqueda, subcategoria o pasillo.</p>
             </div>
           ) : (
             <div className="space-y-3">
-              {catalog.map((item) => (
-                <article key={item.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                  <div className="flex gap-3">
-                    <div className="w-28 shrink-0">
-                      <ThumbnailImage
-                        src={item.thumbnail_url}
-                        label={item.nombre}
-                        alt={`Thumbnail de ${item.nombre}`}
-                        className="h-24 w-full object-cover"
-                        wrapperClassName="mb-0"
-                      />
+              {groupedCatalog.map((laneGroup) => (
+                <section key={laneGroup.laneKey} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-700">{laneGroup.laneLabel}</h3>
+                      <p className="text-xs text-slate-500">{laneGroup.laneDescription}</p>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div>
-                          <p className="text-sm font-semibold text-slate-900">{item.nombre}</p>
-                          <p className="text-xs text-slate-500">{item.alias}</p>
-                        </div>
-                        <span className="rounded-lg border border-white bg-white px-2 py-1 text-xs font-semibold text-slate-700">
-                          Stock: {formatQuantity(item)}
-                        </span>
-                      </div>
-
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <span className="rounded-full border border-slate-200 bg-white px-2 py-1 text-[11px] font-medium text-slate-600">
-                          {getHouseSubcategoryLabel(item.subcategoria) || item.subcategoria || "sin subcategoria"}
-                        </span>
-                      </div>
-
-                      <form action={addToCasaCartAction} className="mt-3 grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-                        <input type="hidden" name="inventoryItemId" value={item.id} />
-                        <label className="flex flex-col gap-1">
-                          <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Cantidad a comprar</span>
-                          <input type="number" name="quantity_to_buy" min="1" defaultValue="1" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900" />
-                        </label>
-                        <label className="flex flex-col gap-1">
-                          <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Precio actual</span>
-                          <input type="number" name="purchase_price" min="0" step="0.01" defaultValue="0" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900" />
-                        </label>
-                        <button type="submit" className="rounded-xl bg-slate-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800">
-                          Agregar
-                        </button>
-                        <label className="sm:col-span-3 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
-                          <input type="checkbox" name="tax_applies" value="1" className="h-4 w-4 rounded border-slate-300" />
-                          <span className="text-xs text-slate-700">Aplica impuesto 11.5%</span>
-                        </label>
-                      </form>
-                    </div>
+                    <span className="rounded-full border border-white bg-white px-2.5 py-1 text-xs font-semibold text-slate-700">
+                      {laneGroup.items.length}
+                    </span>
                   </div>
-                </article>
+                  <div className="space-y-3">
+                    {laneGroup.items.map((item) => (
+                      <article key={item.id} className="rounded-2xl border border-slate-200 bg-white p-3">
+                        <div className="flex gap-3">
+                          <div className="w-28 shrink-0">
+                            <ThumbnailImage
+                              src={item.thumbnail_url}
+                              label={item.nombre}
+                              alt={`Thumbnail de ${item.nombre}`}
+                              className="h-24 w-full object-cover"
+                              wrapperClassName="mb-0"
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div>
+                                <p className="text-sm font-semibold text-slate-900">{item.nombre}</p>
+                                <p className="text-xs text-slate-500">{item.alias}</p>
+                              </div>
+                              <span className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700">
+                                Stock: {formatQuantity(item)}
+                              </span>
+                            </div>
+
+                            <div className="mt-2 flex flex-wrap items-center gap-2">
+                              <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-medium text-slate-600">
+                                {getHouseSubcategoryLabel(item.subcategoria) || item.subcategoria || "sin subcategoria"}
+                              </span>
+                              <span className="rounded-full border border-cyan-200 bg-cyan-50 px-2 py-1 text-[11px] font-medium text-cyan-700">
+                                {getHouseShoppingLaneLabel(getHouseShoppingLaneKey(item))}
+                              </span>
+                            </div>
+
+                            <form action={addToCasaCartAction} className="mt-3 grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+                              <input type="hidden" name="inventoryItemId" value={item.id} />
+                              <label className="flex flex-col gap-1">
+                                <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Cantidad a comprar</span>
+                                <input type="number" name="quantity_to_buy" min="1" defaultValue="1" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900" />
+                              </label>
+                              <label className="flex flex-col gap-1">
+                                <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Precio actual</span>
+                                <input type="number" name="purchase_price" min="0" step="0.01" defaultValue="0" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900" />
+                              </label>
+                              <button type="submit" className="rounded-xl bg-slate-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800">
+                                Agregar
+                              </button>
+                              <label className="sm:col-span-3 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
+                                <input type="checkbox" name="tax_applies" value="1" className="h-4 w-4 rounded border-slate-300" />
+                                <span className="text-xs text-slate-700">Aplica impuesto 11.5%</span>
+                              </label>
+                            </form>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </section>
               ))}
             </div>
           )}

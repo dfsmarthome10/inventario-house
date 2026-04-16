@@ -2,6 +2,7 @@ import Link from "next/link";
 import ThumbnailImage from "@/components/common/ThumbnailImage";
 import { getStockPriority, isLowStock } from "@/lib/inventoryFilters";
 import { getSoonExpirationInfo } from "@/lib/expiration";
+import { getHouseShoppingLaneKey, getHouseShoppingLaneLabel } from "@/lib/houseShoppingLanes";
 
 const PRIORITY_META = {
   critical: {
@@ -35,6 +36,7 @@ export default function InventoryItemCard({ item, variant = "default" }) {
   const priorityMeta = PRIORITY_META[priority] || PRIORITY_META.normal;
   const showroom = variant === "showroom";
   const soonExpiration = getSoonExpirationInfo(item);
+  const houseLane = item.categoria_principal === "casa" ? getHouseShoppingLaneLabel(getHouseShoppingLaneKey(item)) : "";
 
   return (
     <Link
@@ -75,6 +77,9 @@ export default function InventoryItemCard({ item, variant = "default" }) {
         <span className="rounded-full bg-slate-100 px-2 py-1 font-medium text-slate-600">{item.categoria_principal}</span>
         {item.subcategoria ? (
           <span className="rounded-full bg-emerald-100 px-2 py-1 font-medium text-emerald-700">{item.subcategoria}</span>
+        ) : null}
+        {houseLane ? (
+          <span className="rounded-full bg-cyan-100 px-2 py-1 font-medium text-cyan-700">{houseLane}</span>
         ) : null}
         {item.container_type ? (
           <span className="rounded-full bg-violet-100 px-2 py-1 font-medium text-violet-700">{item.container_type}</span>
