@@ -42,7 +42,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="es">
       <body>
-        <div className="mx-auto min-h-screen w-full max-w-5xl px-4 pb-[calc(7.25rem+env(safe-area-inset-bottom))] pt-4 sm:px-6 lg:px-8 xl:pb-10">
+        <div className="pb-app-shell mx-auto min-h-screen w-full max-w-5xl px-4 pt-4 sm:px-6 lg:px-8">
           <header className="mb-6 rounded-3xl border border-slate-200 bg-white/95 p-5 shadow-sm backdrop-blur">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>

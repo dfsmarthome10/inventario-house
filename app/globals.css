@@ -34,6 +34,14 @@ textarea {
 }
 
 @layer components {
+  .pb-app-shell {
+    padding-bottom: calc(7.25rem + env(safe-area-inset-bottom));
+  }
+
+  .app-bottom-nav {
+    display: block;
+  }
+
   .ios-widget {
     @apply rounded-3xl border border-white/70 bg-white/90 p-4 shadow-sm backdrop-blur;
   }
@@ -96,6 +104,16 @@ textarea {
 
   .ios-home-pill-active {
     @apply bg-slate-900 text-white;
+  }
+}
+
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .app-bottom-nav {
+    display: none;
+  }
+
+  .pb-app-shell {
+    padding-bottom: 2.5rem;
   }
 }
 
