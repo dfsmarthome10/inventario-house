@@ -26,7 +26,7 @@ export default function MobileTopMenu() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="relative lg:hidden">
+    <div className="relative xl:hidden">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}

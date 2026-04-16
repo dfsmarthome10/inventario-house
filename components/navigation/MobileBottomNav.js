@@ -142,7 +142,7 @@ export default function MobileBottomNav({ cartBadgeCounts }) {
 
   return (
     <>
-      <div className="ios-bottom-nav lg:hidden">
+      <div className="ios-bottom-nav xl:hidden">
         <div className="ios-bottom-shell">
           <Link href="/shopping" className={`ios-bottom-tab ${shoppingActive ? "ios-bottom-tab-active" : ""}`}>
             <TabIcon type="shopping" active={shoppingActive} />
